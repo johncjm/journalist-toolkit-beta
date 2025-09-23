@@ -1,14 +1,13 @@
-# v15 - Prompt Persona & Anatomy Update
+# v15.1 - Final Corrected Version
 import streamlit as st
 import textwrap
 
 # --- APP CONFIGURATION ---
 st.set_page_config(page_title="Journalist's Toolkit", layout="wide")
 
-# --- CUSTOM CSS (to approximate the mockup's style) ---
+# --- CUSTOM CSS ---
 st.markdown("""
 <style>
-    /* Main card style */
     .card {
         background: white;
         padding: 2rem;
@@ -16,7 +15,6 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         margin-bottom: 2rem;
     }
-    /* Progress bar styling */
     .step-container {
         display: flex;
         justify-content: center;
@@ -24,24 +22,13 @@ st.markdown("""
         margin-bottom: 2rem;
     }
     .step {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        margin: 0 0.5rem;
-        background: #e9ecef;
-        color: #6c757d;
+        width: 35px; height: 35px; border-radius: 50%; display: flex;
+        align-items: center; justify-content: center; font-weight: bold;
+        margin: 0 0.5rem; background: #e9ecef; color: #6c757d;
     }
     .step.active { background: #007bff; color: white; }
     .step.completed { background: #28a745; color: white; }
-    .step-connector {
-        width: 50px;
-        height: 2px;
-        background: #e9ecef;
-    }
+    .step-connector { width: 50px; height: 2px; background: #e9ecef; }
     .step-connector.completed { background: #28a745; }
 </style>
 """, unsafe_allow_html=True)
@@ -61,7 +48,7 @@ def render_progress_bar(current_page: str):
     try:
         current_step_index = pages.index(current_page)
     except ValueError:
-        current_step_index = 0 # Default to first step if page not found
+        current_step_index = 0
 
     steps_html = ""
     for i, page in enumerate(pages):
@@ -80,7 +67,6 @@ def render_progress_bar(current_page: str):
     st.markdown(f'<div class="step-container">{steps_html}</div>', unsafe_allow_html=True)
 
 def copy_button_js(text_to_copy: str, button_text: str = "Copy to Clipboard", key_suffix=""):
-    # A more robust JS for clipboard functionality
     unique_id = f"copy-btn-{key_suffix}"
     text_area_id = f"text-area-{key_suffix}"
     
@@ -111,15 +97,11 @@ if st.session_state.page == "portal":
     st.title("Welcome to the Journalist's Toolkit 🛠️")
     st.subheader("A suite of tools designed to help you think like a journalist and strengthen your work by using AI as a coach.")
     st.markdown("---")
-
     st.markdown("#### How It Works")
     st.write("The toolkit guides you through a simple 3-step process to help you with tasks ranging from shaping a story pitch to polishing copy for publication. Along the way, you'll have a chance to learn about productive ways to work with AI models.")
-
     with st.expander("What’s a “prompt”?"):
         st.markdown("A **prompt** is the request a user makes to an AI, but it's also a set of instructions for how the AI should prepare an answer. **Prompt engineering** is the art of designing those instructions in a way that is most likely to get the best (most accurate, most illuminating) results.")
-    
     st.markdown("---")
-
     colA, colB = st.columns(2)
     with colA:
         st.header("📝 I’ve Got a Job to Do")
@@ -128,14 +110,12 @@ if st.session_state.page == "portal":
             go_to_page("questionnaire"); st.rerun()
         st.button("Structure a first draft", disabled=True, use_container_width=True)
         st.button("Vet a source", disabled=True, use_container_width=True)
+        st.button("Develop interview questions", disabled=True, use_container_width=True)
     with colB:
         st.header("🤔 I Want to Think Something Through")
         st.markdown("""
             Engage with a "Team of Rivals' -- top AI models ChatGPT, Claude and Gemini work together as an expert panel for more open-ended discussions. They can help you:
-            - come up with solutions to complex problems
-            - explore new strategies
-            - troubleshoot code
-            - think through ethical dilemmas
+            - come up with solutions to complex problems, - explore new strategies, - troubleshoot code, - think through ethical dilemmas
             """)
 
 # =========================
@@ -145,7 +125,6 @@ elif st.session_state.page == "questionnaire":
     render_progress_bar("questionnaire")
     st.title("Story Pitch Coach")
     st.markdown("Filling out this questionnaire helps you think through the key elements of your pitch. It also will give the AI model more context to go on.")
-    
     with st.form("pitch_form"):
         st.markdown('<div class="card">', unsafe_allow_html=True)
         pitch_text = st.text_area("**Paste your story pitch here (Required):**", height=200)
@@ -159,20 +138,16 @@ elif st.session_state.page == "questionnaire":
             target_audience = st.selectbox("Target audience", ["General news readers", "Specialist/Expert audience", "Other"])
             sources = st.text_area("Sources & resources", height=90)
             reporting_stage = st.selectbox("How far along are you?", ["Just an idea", "Some reporting done", "Drafting in progress"])
-        
         st.subheader("Coaching Preferences")
         coaching_style = st.selectbox("**Choose a coaching style (Optional):**", ["Default Story Coach", "Tough Desk Editor", "Audience Advocate", "Skeptic"])
         st.markdown('</div>', unsafe_allow_html=True)
-        
         submitted = st.form_submit_button("Generate Prompt Recipe", type="primary", use_container_width=True)
-
         if submitted:
             if not pitch_text or not pitch_text.strip():
                 st.error("Please paste your story pitch before submitting.")
             else:
                 st.session_state.form_data = locals()
                 go_to_page("recipe"); st.rerun()
-
     if st.button("← Back to Portal"):
         go_to_page("portal"); st.rerun()
 
@@ -183,7 +158,6 @@ elif st.session_state.page == "recipe":
     render_progress_bar("recipe")
     st.title("Your Custom Prompt Recipe 📝")
     st.markdown("AI models work best when given well-structured prompts that **provide clear context, define a specific role and goal, and outline the desired format for the response.** What's been assembled here combines the specifics from your story pitch questionnaire with elements from prompts optimized for this task.")
-
     data = st.session_state.get("form_data", {})
     context_lines = [ f"- Story Type: {data.get('content_type', 'N/A')}", f"- Target Audience: {data.get('target_audience', 'N/A')}", f"- Stage: {data.get('reporting_stage', 'N/A')}",]
     if data.get("working_headline"): context_lines.append(f"- Working Headline: \"{data['working_headline']}\"")
@@ -191,7 +165,6 @@ elif st.session_state.page == "recipe":
     if data.get("sources"): context_lines.append(f"- Sources: {data['sources']}")
     context_lines.append(f"- User's Pitch: \"{data.get('pitch_text', '').strip()}\"")
     full_context = "\n".join(context_lines)
-
     final_prompt = textwrap.dedent(f"""
     # 1. INTRODUCTION
     You are an expert journalism mentor. Act as a Socratic coach for a student journalist. Your goal is to help them improve their pitch through a collaborative workshop — **coach, not do**. Your tone should be professional, encouraging, and realistic. Praise potential where you see it, but do not offer false encouragement. Be direct about challenges and weaknesses in a constructive way.
@@ -201,13 +174,11 @@ elif st.session_state.page == "recipe":
 
     # 3. EDITORIAL JUDGMENT FRAMEWORK (Your Internal Engine)
     Before you respond, silently form a preliminary hypothesis about the pitch’s greatest strength and single biggest challenge.
-
     **Red Flags to look for:**
     - The writer is more excited about the topic than the story.
     - It assumes readers will care without explaining why.
     - It conflates “important” with “interesting.”
     - It has done research but hasn’t found the core tension/conflict.
-
     **Green Flags to look for:**
     - It can explain the story in one clear sentence.
     - It identifies specific people affected in specific ways.
@@ -215,24 +186,18 @@ elif st.session_state.page == "recipe":
     - It has a plausible reporting plan.
 
     # 4. CONVERSATIONAL FLOW (Your Task)
-
     ## Turn 1: The Editorial Reaction
     Choose ONE of the reaction patterns below (don’t announce which):
-
     * **Pattern A: Intrigued but need more...** (Good hook; unclear angle/purpose)
         * Example opener: “This could be compelling — the detail about [specific element] pops. I’m not yet seeing the central angle. What’s the one thing that would make a reader stop and pay attention?”
-
     * **Pattern B: Promising with a clear gap...** (Solid pitch; one major flaw)
         * Example opener: “There’s a strong story here and your sourcing is solid. The main gap is [gap]. To focus that, my first question is: [one precise question about the gap].”
-
     * **Pattern C: Skeptical but open...** (Topic-y, not yet a story)
         * Example opener: “I’m not seeing a specific angle yet, but I suspect there’s one we can find. What surprised you most when you first thought about this?”
-
     ## Turn 2–3: Deep Dive
     - Reflect back the user’s answer in one sentence (“So the core tension is X...”).
     - Ask 1–2 follow-ups that push on the core issue.
     - Do **not** provide concrete deliverables yet.
-
     ## Turn 4+: Targeted Coaching & the “Choice Point”
     After you understand the pitch, provide one concrete deliverable (e.g., verification checklist or next reporting steps). Then:
     1) **Provide the deliverable.**
@@ -247,15 +212,12 @@ elif st.session_state.page == "recipe":
     - **Guardrail:** If asked to write the pitch for them, decline and steer back to questions, structure, and next actions.
     - **Final Reminder:** Your primary goal is to be a Socratic coach. Ask guiding questions; do not provide rewritten text or do the work for the user.
     """)
-    
     st.markdown("---")
-    
     col1, col2 = st.columns([2, 1])
     with col1:
         st.subheader("Your Assembled Prompt")
         st.text_area("Prompt Text", final_prompt, height=450, label_visibility="collapsed")
         copy_button_js(final_prompt, "Copy Full Prompt", "main")
-        
     with col2:
         st.subheader("Anatomy of the Prompt")
         st.markdown("""
@@ -268,29 +230,22 @@ elif st.session_state.page == "recipe":
         """)
         if st.button("Just copy it", use_container_width=True):
             st.session_state.just_copied = True
-    
     if 'just_copied' in st.session_state and st.session_state.just_copied:
         copy_button_js(final_prompt, "Just copy it", "quick")
         st.session_state.just_copied = False
-
     st.markdown("---")
-    
     st.subheader("Start Your Coaching Session (opens a new tab)")
     c1, c2, c3 = st.columns(3)
     with c1: st.link_button("Open Google Gemini", "https://gemini.google.com", use_container_width=True)
     with c2: st.link_button("Open Anthropic Claude", "https://claude.ai", use_container_width=True)
     with c3: st.link_button("Open OpenAI ChatGPT", "https://chat.openai.com", use_container_width=True)
-
     st.subheader("Tips for Your Coaching Session")
     st.markdown("- **Be an active partner.** Push back, question assumptions, or ask for clarification.\n- **Correct misunderstandings.** If the AI misinterprets something, correct it directly.\n- **Ask for alternatives.** If you don't like a suggestion, ask for a different one.")
     with st.expander("Quick example: weak vs strong opening"):
         st.markdown("**Weak:** “Thoughts?”\n\n**Stronger:** “Acting as a tough but fair editor, what's the single biggest weakness in this pitch that I should fix first?”")
-    
     st.markdown("---")
-
     st.subheader("Come back after you've talked with Coach!")
     st.markdown("To learn more about how to improve your work -- and about how AI works -- come back to this page. You'll be able to continue the discussion with the same AI bot but with it taking on a different perspective, or to get a second opinion on your work -- and an analysis of your interaction with the Coach -- from another AI model.")
-
     if st.button("Continue to Next Steps →", type="primary"):
         go_to_page("follow_on"); st.rerun()
 
@@ -302,7 +257,6 @@ elif st.session_state.page == "follow_on":
     st.title("Workshop Results & Next Steps")
     st.markdown("Like a newsroom, a **second set of eyes** can reveal new angles and blind spots. Use the tools below to review your session.")
     st.markdown("---")
-    
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.header("Get a Second Set of Eyes on Your Workshop")
     st.subheader("Option 1: Ask the **Same** Coach for a Different Perspective")
@@ -319,9 +273,7 @@ elif st.session_state.page == "follow_on":
         """)
         st.code(follow_up_prompt, language="markdown")
         st.info("Copy this and paste it into your **existing** AI conversation.")
-    
     st.markdown("---")
-    
     st.subheader("Option 2: Get a **Full Review** from a **Different** AI")
     transcript = st.text_area("**Paste highlights from your session:**", height=250)
     w, c = get_counter(transcript)
@@ -331,13 +283,11 @@ elif st.session_state.page == "follow_on":
             reviewer_prompt = textwrap.dedent(f"""
             You are reviewing a **coaching transcript** between a journalist and an AI about a story pitch.
             Your job: audit the quality of the coaching and surface missed opportunities.
-
             ## Materials
             TRANSCRIPT (verbatim, may be partial):
             ---
             {transcript.strip()}
             ---
-
             ## Your Task
             1) **What worked:** Name 2 things the coach did well (brief).
             2) **What was missed:** List 3 **specific** questions the coach *should* have asked (Socratic, not leading).
@@ -354,14 +304,11 @@ elif st.session_state.page == "follow_on":
         else:
             st.warning("Please paste a transcript to generate a reviewer prompt.")
     st.markdown('</div>', unsafe_allow_html=True)
-
     st.markdown("---")
-    
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.header("Self-Reflection")
     st.markdown("- What was the single most useful question the coach asked?\n- Which suggestion did you push back on, and why?\n- What’s your immediate next reporting action?")
     st.markdown('</div>', unsafe_allow_html=True)
-    
     colb1, colb2 = st.columns([1,1])
     with colb1:
         if st.button("← Start Another Pitch", use_container_width=True):

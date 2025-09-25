@@ -1,4 +1,4 @@
-# v15.1 - Final Corrected Version
+# v15.3 - Functional choice page and dynamic questionnaire shell
 import streamlit as st
 import textwrap
 
@@ -66,6 +66,7 @@ def render_progress_bar(current_page: str):
 
     st.markdown(f'<div class="step-container">{steps_html}</div>', unsafe_allow_html=True)
 
+
 def copy_button_js(text_to_copy: str, button_text: str = "Copy to Clipboard", key_suffix=""):
     unique_id = f"copy-btn-{key_suffix}"
     text_area_id = f"text-area-{key_suffix}"
@@ -108,15 +109,64 @@ if st.session_state.page == "portal":
         st.markdown("Use a structured prompt to get the best and most reliable coaching on a specific newsroom task.")
         if st.button("Prepare a story pitch", type="primary", use_container_width=True):
             go_to_page("questionnaire"); st.rerun()
+        # NEW: Entry point for Get Ready to Report
+        if st.button("Get Ready to Report", type="primary", use_container_width=True):
+            go_to_page("grr_choice"); st.rerun()
         st.button("Structure a first draft", disabled=True, use_container_width=True)
         st.button("Vet a source", disabled=True, use_container_width=True)
         st.button("Develop interview questions", disabled=True, use_container_width=True)
     with colB:
         st.header("🤔 I Want to Think Something Through")
-        st.markdown("""
+        st.markdown(
+            """
             Engage with a "Team of Rivals' -- top AI models ChatGPT, Claude and Gemini work together as an expert panel for more open-ended discussions. They can help you:
             - come up with solutions to complex problems, - explore new strategies, - troubleshoot code, - think through ethical dilemmas
-            """)
+            """
+        )
+
+# =========================
+# Page 1.5: Get Ready to Report – Choice
+# =========================
+elif st.session_state.page == "grr_choice":
+    st.title("Get Ready to Report 📋")
+    st.markdown("First, how would you describe your main reporting task?")
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("Event", use_container_width=True):
+            st.session_state.reporting_path = "event"
+            go_to_page("reporting_plan_questionnaire"); st.rerun()
+        st.info("An event is coming up and you want to prepare for it.")
+    
+    with col2:
+        if st.button("Explore", use_container_width=True):
+            st.session_state.reporting_path = "explore"
+            go_to_page("reporting_plan_questionnaire"); st.rerun()
+        st.info("You're immersing yourself in a subject to find a story, embracing 'serendipity through shoe leather.'")
+
+    with col3:
+        if st.button("Confirm", use_container_width=True):
+            st.session_state.reporting_path = "confirm"
+            go_to_page("reporting_plan_questionnaire"); st.rerun()
+        st.info("You're trying to find out what a situation is and gather enough evidence to write authoritatively about it.")
+    
+    st.markdown("---")
+    if st.button("← Back to Portal"):
+        go_to_page("portal"); st.rerun()
+        
+# =========================
+# Page 1.6: Get Ready to Report - Questionnaire (shell)
+# =========================
+elif st.session_state.page == "reporting_plan_questionnaire":
+    # Read the chosen path from session state
+    path = st.session_state.get("reporting_path", "event") # Default to event
+    
+    st.title(f"Reporting Plan: {path.capitalize()} Path")
+    st.markdown(f"This is the placeholder for the **{path}** questionnaire. We will build the form here.")
+    
+    st.markdown("---")
+    if st.button("← Back to Choices"):
+        go_to_page("grr_choice"); st.rerun()
 
 # =========================
 # Page 2: Questionnaire
@@ -124,7 +174,7 @@ if st.session_state.page == "portal":
 elif st.session_state.page == "questionnaire":
     render_progress_bar("questionnaire")
     st.title("Story Pitch Coach")
-    st.markdown("Filling out this questionnaire helps you think through the key elements of your pitch. It also will give the AI model more context to go on.")
+    # ... rest of the original Story Pitch questionnaire code ...
     with st.form("pitch_form"):
         st.markdown('<div class="card">', unsafe_allow_html=True)
         pitch_text = st.text_area("**Paste your story pitch here (Required):**", height=200)
@@ -157,7 +207,7 @@ elif st.session_state.page == "questionnaire":
 elif st.session_state.page == "recipe":
     render_progress_bar("recipe")
     st.title("Your Custom Prompt Recipe 📝")
-    st.markdown("AI models work best when given well-structured prompts that **provide clear context, define a specific role and goal, and outline the desired format for the response.** What's been assembled here combines the specifics from your story pitch questionnaire with elements from prompts optimized for this task.")
+    # ... rest of the original recipe page code ...
     data = st.session_state.get("form_data", {})
     context_lines = [ f"- Story Type: {data.get('content_type', 'N/A')}", f"- Target Audience: {data.get('target_audience', 'N/A')}", f"- Stage: {data.get('reporting_stage', 'N/A')}",]
     if data.get("working_headline"): context_lines.append(f"- Working Headline: \"{data['working_headline']}\"")
@@ -220,14 +270,16 @@ elif st.session_state.page == "recipe":
         copy_button_js(final_prompt, "Copy Full Prompt", "main")
     with col2:
         st.subheader("Anatomy of the Prompt")
-        st.markdown("""
+        st.markdown(
+        """
         - **1. Introduction:** This sets the stage. It tells the AI its **role** (expert mentor), its **goal** (to coach, not write), and its **persona** (encouraging but realistic).
         - **2. Context:** Here, we inject all the specific details from your questionnaire. This gives the AI the crucial raw material it needs to provide tailored, relevant feedback.
         - **3. Editorial Framework:** This is the AI's 'internal engine.' We give it a specific analytical model (red/green flags) to use, ensuring a high-quality critique.
         - **4. Conversational Flow:** This section structures the entire conversation. By specifying a turn-by-turn process, we prevent the AI from wandering and ensure the session is productive.
         - **5. Core Constraints:** These are the hard-and-fast rules. They handle edge cases, prevent the AI from doing the work for the user, and ensure the interaction stays on track.
         - **6. The Final Reminder:** After all the details, we restate the main goal. It's like planning a party: after discussing the cake and decorations, you say, 'Okay, but let's remember the whole point is to celebrate the birthday person!'
-        """)
+        """
+        )
         if st.button("Just copy it", use_container_width=True):
             st.session_state.just_copied = True
     if 'just_copied' in st.session_state and st.session_state.just_copied:
@@ -255,6 +307,7 @@ elif st.session_state.page == "recipe":
 elif st.session_state.page == "follow_on":
     render_progress_bar("follow_on")
     st.title("Workshop Results & Next Steps")
+    # ... rest of the original follow_on page code ...
     st.markdown("Like a newsroom, a **second set of eyes** can reveal new angles and blind spots. Use the tools below to review your session.")
     st.markdown("---")
     st.markdown('<div class="card">', unsafe_allow_html=True)

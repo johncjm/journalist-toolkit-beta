@@ -1,4 +1,4 @@
-# v15.3 - Functional choice page and dynamic questionnaire shell
+# v15.4 - New home page layout and text, plus expanders on choice page
 import streamlit as st
 import textwrap
 
@@ -15,21 +15,6 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         margin-bottom: 2rem;
     }
-    .step-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 2rem;
-    }
-    .step {
-        width: 35px; height: 35px; border-radius: 50%; display: flex;
-        align-items: center; justify-content: center; font-weight: bold;
-        margin: 0 0.5rem; background: #e9ecef; color: #6c757d;
-    }
-    .step.active { background: #007bff; color: white; }
-    .step.completed { background: #28a745; color: white; }
-    .step-connector { width: 50px; height: 2px; background: #e9ecef; }
-    .step-connector.completed { background: #28a745; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -38,34 +23,11 @@ st.markdown("""
 def go_to_page(page_name: str):
     st.session_state.page = page_name
 
+# ... (other helper functions like get_counter, copy_button_js remain the same) ...
 def get_counter(text: str):
     words = len(text.split()) if text else 0
     chars = len(text) if text else 0
     return words, chars
-
-def render_progress_bar(current_page: str):
-    pages = ["portal", "questionnaire", "recipe", "follow_on"]
-    try:
-        current_step_index = pages.index(current_page)
-    except ValueError:
-        current_step_index = 0
-
-    steps_html = ""
-    for i, page in enumerate(pages):
-        if i > 0:
-            connector_class = "step-connector completed" if i <= current_step_index else "step-connector"
-            steps_html += f'<div class="{connector_class}"></div>'
-        
-        step_class = "step"
-        if i < current_step_index:
-            step_class += " completed"
-        elif i == current_step_index:
-            step_class += " active"
-        
-        steps_html += f'<div class="{step_class}">{i+1}</div>'
-
-    st.markdown(f'<div class="step-container">{steps_html}</div>', unsafe_allow_html=True)
-
 
 def copy_button_js(text_to_copy: str, button_text: str = "Copy to Clipboard", key_suffix=""):
     unique_id = f"copy-btn-{key_suffix}"
@@ -94,61 +56,92 @@ if "page" not in st.session_state:
 # Page 1: The Portal
 # =========================
 if st.session_state.page == "portal":
-    render_progress_bar("portal")
     st.title("Welcome to the Journalist's Toolkit 🛠️")
     st.subheader("A suite of tools designed to help you think like a journalist and strengthen your work by using AI as a coach.")
     st.markdown("---")
-    st.markdown("#### How It Works")
-    st.write("The toolkit guides you through a simple 3-step process to help you with tasks ranging from shaping a story pitch to polishing copy for publication. Along the way, you'll have a chance to learn about productive ways to work with AI models.")
-    with st.expander("What’s a “prompt”?"):
-        st.markdown("A **prompt** is the request a user makes to an AI, but it's also a set of instructions for how the AI should prepare an answer. **Prompt engineering** is the art of designing those instructions in a way that is most likely to get the best (most accurate, most illuminating) results.")
-    st.markdown("---")
-    colA, colB = st.columns(2)
-    with colA:
-        st.header("📝 I’ve Got a Job to Do")
-        st.markdown("Use a structured prompt to get the best and most reliable coaching on a specific newsroom task.")
-        if st.button("Prepare a story pitch", type="primary", use_container_width=True):
-            go_to_page("questionnaire"); st.rerun()
-        # NEW: Entry point for Get Ready to Report
-        if st.button("Get Ready to Report", type="primary", use_container_width=True):
-            go_to_page("grr_choice"); st.rerun()
+
+    # Main "Job to Do" section (full width)
+    st.header("📝 I’ve Got a Job to Do")
+    st.markdown("""
+    Covering the news involves a wide range of tasks, from shaping a story idea to polishing copy for publication. We offer tools to help you learn those skills by working with AI models that will coach you rather than just doing the work for you.  
+
+    **Journalist's Toolkit works like this:**
+    * pick a task and think it through by answering the kinds of questions an editor would ask
+    * that info is combined with a "prompt" engineered to get the best out of an AI bot
+    * you take that prompt to a bot, which will guide you through a constructive discussion leading to a "next steps" plan 
+
+    Along the way, you'll gain insight into what AI bots do and don't do well, and how to get the most out of an AI collaboration.
+    """)
+    
+    if st.button("Prepare a story pitch", type="primary", use_container_width=True):
+        go_to_page("questionnaire"); st.rerun()
+    if st.button("Get Ready to Report", type="primary", use_container_width=True):
+        go_to_page("grr_choice"); st.rerun()
+    
+    c1, c2, c3 = st.columns(3)
+    with c1:
         st.button("Structure a first draft", disabled=True, use_container_width=True)
+    with c2:
         st.button("Vet a source", disabled=True, use_container_width=True)
+    with c3:
         st.button("Develop interview questions", disabled=True, use_container_width=True)
-    with colB:
-        st.header("🤔 I Want to Think Something Through")
-        st.markdown(
-            """
-            Engage with a "Team of Rivals' -- top AI models ChatGPT, Claude and Gemini work together as an expert panel for more open-ended discussions. They can help you:
-            - come up with solutions to complex problems, - explore new strategies, - troubleshoot code, - think through ethical dilemmas
-            """
-        )
+
+    st.markdown("---")
+
+    # De-emphasized "Team of Rivals" section
+    st.info("Looking for a different kind of AI collaboration?", icon="🤔")
+    st.markdown("""
+    If you're looking to test the idea that three heads are better than one for deep strategic or coding questions, feel free to try the beta version of **Team of Rivals**. It brings ChatGPT, Claude, and Gemini together for multi-round discussions where the models can help protect you from each other's flaws and build on each other's strengths.
+    """)
+
 
 # =========================
 # Page 1.5: Get Ready to Report – Choice
 # =========================
 elif st.session_state.page == "grr_choice":
     st.title("Get Ready to Report 📋")
-    st.markdown("First, how would you describe your main reporting task?")
+    st.markdown("Different kinds of stories call for different kinds of preparation. How would you describe your story?")
+    st.markdown("---")
 
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("Event", use_container_width=True):
             st.session_state.reporting_path = "event"
             go_to_page("reporting_plan_questionnaire"); st.rerun()
-        st.info("An event is coming up and you want to prepare for it.")
+        st.markdown("**You know that something is going to happen that seems worth covering, whether a one-shot City Council meeting or a months-long City Council campaign.**")
+        with st.expander("Click for examples"):
+            st.markdown("""
+            - A school board vote on a controversial new curriculum.
+            - A planned protest at a corporate headquarters.
+            - The quarterly earnings report for a major local employer.
+            - A star athlete's final home game before retirement.
+            """)
     
     with col2:
         if st.button("Explore", use_container_width=True):
             st.session_state.reporting_path = "explore"
             go_to_page("reporting_plan_questionnaire"); st.rerun()
-        st.info("You're immersing yourself in a subject to find a story, embracing 'serendipity through shoe leather.'")
+        st.markdown("**You think there's something interesting to write about in a given subject, whether it's a social-media craze or a neighborhood or a business trend, but you aren't sure what the story angle will turn out to be.**")
+        with st.expander("Click for examples"):
+            st.markdown("""
+            - Profiling a neighborhood that's rapidly gentrifying.
+            - Investigating the rise of a new local fashion trend.
+            - Understanding the culture of a local amateur sports league.
+            - Documenting the daily life of a street artist.
+            """)
 
     with col3:
         if st.button("Confirm", use_container_width=True):
             st.session_state.reporting_path = "confirm"
             go_to_page("reporting_plan_questionnaire"); st.rerun()
-        st.info("You're trying to find out what a situation is and gather enough evidence to write authoritatively about it.")
+        st.markdown("**You hear or have other reason to think that X has happened or is happening and are trying to figure out if that's true -- and how to get enough material to be able to write about it.**")
+        with st.expander("Click for examples"):
+            st.markdown("""
+            - A tip that a local restaurant is closing due to health violations.
+            - A rumor that a city official has a conflict of interest.
+            - A claim on social media that a local factory is polluting a river.
+            - An observation that a specific crime is on the rise in a community.
+            """)
     
     st.markdown("---")
     if st.button("← Back to Portal"):
@@ -159,7 +152,7 @@ elif st.session_state.page == "grr_choice":
 # =========================
 elif st.session_state.page == "reporting_plan_questionnaire":
     # Read the chosen path from session state
-    path = st.session_state.get("reporting_path", "event") # Default to event
+    path = st.session_state.get("reporting_path", "event")
     
     st.title(f"Reporting Plan: {path.capitalize()} Path")
     st.markdown(f"This is the placeholder for the **{path}** questionnaire. We will build the form here.")
@@ -168,13 +161,13 @@ elif st.session_state.page == "reporting_plan_questionnaire":
     if st.button("← Back to Choices"):
         go_to_page("grr_choice"); st.rerun()
 
+# ... (The rest of the code for questionnaire, recipe, and follow_on pages remains unchanged) ...
 # =========================
 # Page 2: Questionnaire
 # =========================
 elif st.session_state.page == "questionnaire":
-    render_progress_bar("questionnaire")
     st.title("Story Pitch Coach")
-    # ... rest of the original Story Pitch questionnaire code ...
+    # ... code for Story Pitch questionnaire ...
     with st.form("pitch_form"):
         st.markdown('<div class="card">', unsafe_allow_html=True)
         pitch_text = st.text_area("**Paste your story pitch here (Required):**", height=200)
@@ -200,14 +193,13 @@ elif st.session_state.page == "questionnaire":
                 go_to_page("recipe"); st.rerun()
     if st.button("← Back to Portal"):
         go_to_page("portal"); st.rerun()
-
 # =========================
 # Page 3: Prompt Recipe
 # =========================
 elif st.session_state.page == "recipe":
-    render_progress_bar("recipe")
     st.title("Your Custom Prompt Recipe 📝")
-    # ... rest of the original recipe page code ...
+    # ... code for Story Pitch recipe page ...
+    st.markdown("AI models work best when given well-structured prompts that **provide clear context, define a specific role and goal, and outline the desired format for the response.** What's been assembled here combines the specifics from your story pitch questionnaire with elements from prompts optimized for this task.")
     data = st.session_state.get("form_data", {})
     context_lines = [ f"- Story Type: {data.get('content_type', 'N/A')}", f"- Target Audience: {data.get('target_audience', 'N/A')}", f"- Stage: {data.get('reporting_stage', 'N/A')}",]
     if data.get("working_headline"): context_lines.append(f"- Working Headline: \"{data['working_headline']}\"")
@@ -300,14 +292,12 @@ elif st.session_state.page == "recipe":
     st.markdown("To learn more about how to improve your work -- and about how AI works -- come back to this page. You'll be able to continue the discussion with the same AI bot but with it taking on a different perspective, or to get a second opinion on your work -- and an analysis of your interaction with the Coach -- from another AI model.")
     if st.button("Continue to Next Steps →", type="primary"):
         go_to_page("follow_on"); st.rerun()
-
 # =========================
 # Page 4: Workshop / Follow-on
 # =========================
 elif st.session_state.page == "follow_on":
-    render_progress_bar("follow_on")
     st.title("Workshop Results & Next Steps")
-    # ... rest of the original follow_on page code ...
+    # ... code for follow_on page ...
     st.markdown("Like a newsroom, a **second set of eyes** can reveal new angles and blind spots. Use the tools below to review your session.")
     st.markdown("---")
     st.markdown('<div class="card">', unsafe_allow_html=True)

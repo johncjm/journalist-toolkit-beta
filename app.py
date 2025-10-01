@@ -1,4 +1,4 @@
-# v15.6 - Adds the functional questionnaire form for the "Event" path
+# v15.7 - New, granular questionnaire for the "Event" path
 import streamlit as st
 import textwrap
 
@@ -155,24 +155,28 @@ elif st.session_state.page == "reporting_plan_questionnaire":
     st.title(f"Reporting Plan: {path.capitalize()} Path")
     
     if path == "event":
-        st.markdown("To get you ready for this event, let's walk through three quick sections.")
+        st.markdown("To get you ready for this event, let's walk through the key questions an editor would ask.")
         
         with st.form("event_plan_form"):
             st.markdown('<div class="card">', unsafe_allow_html=True)
             
-            st.markdown("### Part 1: The Situation (The 'W's')")
-            event_basics = st.text_input("The Basics: What is the event, when is it, and where?")
-            key_players = st.text_area("The Players: Who are the key people to watch?")
-            prep_work = st.text_area("The Prep Work: What's the key document to read, and most importantly, what's hanging in the balance?")
+            st.markdown("### Part 1: The Situation")
+            q1_headline = st.text_input("What's happening -- how would you sum up the story in a headline or tweet?")
+            q2_where_when = st.text_input("Where and when is it happening?")
+            q3_key_people = st.text_input("Who are the key people involved?")
+            q4_why_now = st.text_input("Why is it happening now? (Or whenever it's expected.)")
 
             st.markdown("---")
-            st.markdown("### Part 2: The Stakes (Why it Matters)")
-            newsworthiness = st.text_area("Newsworthiness: How big a story is this, who is it most important for, and why?")
-            experience = st.text_area("Your Experience: Have you covered this beat or topic before? What have you learned about what makes these stories tricky or newsworthy?")
+            st.markdown("### Part 2: The Stakes")
+            q5_how_big = st.text_input("How big a story is this?")
+            q6_important = st.text_input("What makes it important?")
+            q7_audience = st.text_input("Who is it most important for -- what's the key audience for this story?")
 
             st.markdown("---")
-            st.markdown("### Part 3: The Reporter's Mindset (Your Approach)")
-            readiness = st.text_area("Your Readiness: Is there anything specific that makes you excited or anxious about this? What do you feel most and least prepared for?")
+            st.markdown("### Part 3: Getting Started")
+            q8_work_done = st.text_area("What work have you done so far to prepare?")
+            q9_work_left = st.text_area("What is the key work left to do -- what documents to read or people to interview?")
+            q10_anxious_excited = st.text_area("Is there anything about this subject that makes you especially excited or anxious about covering it?")
             
             st.markdown('</div>', unsafe_allow_html=True)
             
@@ -206,19 +210,18 @@ elif st.session_state.page == "reporting_plan_recipe":
 # =========================
 elif st.session_state.page == "questionnaire":
     st.title("Story Pitch Coach")
-    # ... (full, unchanged code for the Story Pitch tool) ...
-    # This section is omitted for brevity but is identical to the previous version
-    
+    # ... (Full, unchanged code for the Story Pitch tool)
+    with st.form("pitch_form"):
+        # ...
 # =========================
 # Page 3: Prompt Recipe
 # =========================
 elif st.session_state.page == "recipe":
     st.title("Your Custom Prompt Recipe 📝")
-    # ... (full, unchanged code for the Story Pitch tool) ...
-
+    # ... (Full, unchanged code for the Story Pitch tool)
 # =========================
 # Page 4: Workshop / Follow-on
 # =========================
 elif st.session_state.page == "follow_on":
     st.title("Workshop Results & Next Steps")
-    # ... (full, unchanged code for the Story Pitch tool) ...
+    # ... (Full, unchanged code for the Story Pitch tool)

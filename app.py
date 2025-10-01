@@ -1,4 +1,5 @@
-# v15.8 - Final "Event" path with functional prompt recipe page
+
+# v15.9 - Adds "Anatomy of the Prompt" explainer to the Event recipe page
 import streamlit as st
 import textwrap
 
@@ -200,10 +201,10 @@ elif st.session_state.page == "reporting_plan_questionnaire":
 elif st.session_state.page == "reporting_plan_recipe":
     st.title("Your Custom Reporting Plan Prompt 📝")
     st.markdown("This prompt has been assembled from your answers. Take it to your preferred AI chat tool to start your coaching session.")
+    st.markdown("---")
     
     data = st.session_state.get("event_form_data", {})
-
-    # Format the context from the form data
+    
     context_string = f"""
 - Headline/Tweet: {data.get('q1_headline', 'N/A')}
 - Where & When: {data.get('q2_where_when', 'N/A')}
@@ -257,10 +258,22 @@ elif st.session_state.page == "reporting_plan_recipe":
     # 5. FINAL GOAL REMINDER
     Remember, your primary goal is to be a Socratic coach. The final output of this conversation should be that the student has a clear, actionable checklist that *they* have built. Your role is to ask the guiding questions that lead them to that outcome.
     """)
-
-    st.text_area("Your Assembled Prompt", final_prompt, height=400, label_visibility="collapsed")
-    copy_button_js(final_prompt, "Copy Full Prompt", "main")
     
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        st.subheader("Your Assembled Prompt")
+        st.text_area("Prompt Text", final_prompt, height=450, label_visibility="collapsed")
+        copy_button_js(final_prompt, "Copy Full Prompt", "main")
+    with col2:
+        st.subheader("Anatomy of the Prompt")
+        st.markdown("""
+        - **1. Role & Goal:** Sets the AI's persona (an experienced editor) and its core objective (to coach, not do).
+        - **2. Context:** Injects the specific answers from your questionnaire, giving the AI the raw material it needs.
+        - **3. The Coaching Flow:** This is the AI's main playbook. It includes our sophisticated two-tiered logic for starting the conversation and then outlines the key topics for the main coaching dialogue.
+        - **4. Core Constraints:** These are the hard-and-fast rules to keep the AI on track, ensuring it remains a Socratic guide.
+        - **5. Final Goal Reminder:** A final, clear instruction that re-centers the AI on its most important task: helping the user build their own plan.
+        """)
+
     st.markdown("---")
     st.subheader("Start Your Coaching Session (opens a new tab)")
     c1, c2, c3 = st.columns(3)
@@ -278,10 +291,6 @@ elif st.session_state.page == "reporting_plan_recipe":
 elif st.session_state.page == "questionnaire":
     st.title("Story Pitch Coach")
     # ... (Full, unchanged code for the Story Pitch tool) ...
-    with st.form("pitch_form"):
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        pitch_text = st.text_area("**Paste your story pitch here (Required):**", height=200)
-        # ... and so on ...
 
 # =========================
 # Page 3: Prompt Recipe

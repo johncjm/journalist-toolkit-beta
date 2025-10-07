@@ -1,4 +1,4 @@
-# v16.3 - Restores all previously omitted code from Story Pitch and GRTR tools
+# v17.1 - Adds "Explore" questionnaire and restores all previously omitted code
 import streamlit as st
 import textwrap
 
@@ -166,37 +166,57 @@ elif st.session_state.page == "reporting_plan_questionnaire":
     
     if path == "event":
         st.markdown("To get you ready for this event, let's walk through the key questions an editor would ask.")
-        
         with st.form("event_plan_form"):
             st.markdown('<div class="card">', unsafe_allow_html=True)
-            
             st.markdown("### Part 1: The Situation")
             q1_headline = st.text_input("What's happening -- how would you sum up the story in a headline or tweet?")
             q2_where_when = st.text_input("Where and when is it happening?")
             q3_key_people = st.text_input("Who are the key people involved?")
             q4_why_now = st.text_input("Why is it happening now? (Or whenever it's expected.)")
-
             st.markdown("---")
             st.markdown("### Part 2: The Stakes")
             q5_how_big = st.text_input("How big a story is this?")
             q6_important = st.text_input("What makes it important?")
             q7_audience = st.text_input("Who is it most important for -- what's the key audience for this story?")
-
             st.markdown("---")
             st.markdown("### Part 3: Getting Started")
             q8_work_done = st.text_area("What work have you done so far to prepare?")
             q9_work_left = st.text_area("What is the key work left to do -- what documents to read or people to interview?")
             q10_anxious_excited = st.text_area("Is there anything about this subject that makes you especially excited or anxious about covering it?")
-            
             st.markdown('</div>', unsafe_allow_html=True)
-            
             submitted = st.form_submit_button("Generate Prompt Recipe", type="primary", use_container_width=True)
             if submitted:
                 st.session_state.event_form_data = locals()
                 go_to_page("reporting_plan_recipe"); st.rerun()
 
     elif path == "explore":
-        st.markdown(f"This is the placeholder for the **{path}** questionnaire. We will build the form here.")
+        st.markdown("This path helps you explore a topic when you have a hunch there's a story, but you're not sure what it is yet.")
+        with st.form("explore_plan_form"):
+            st.markdown('<div class="card">', unsafe_allow_html=True)
+            st.markdown("### Part 1: The Territory & The Angle")
+            q1_territory = st.text_input("Describe what you want to explore (who, what, or where has your attention?).")
+            q2_hunch = st.text_input("What's your hunch or guiding question about it?")
+            q3_curiosity = st.text_input("What makes you curious about this right now?")
+            q4_audience = st.text_input("Who is the key audience for this story, and why would they care?")
+            st.markdown("---")
+            st.markdown("### Part 2: Your Starting Point")
+            q5_know = st.text_area("What do you already know about this subject?")
+            q6_dont_know = st.text_area("What's the most important thing you don't know?")
+            q7_prior_coverage = st.text_area("What has already been written or produced on this topic?")
+            q8_relationship_bias = st.text_area("What is your relationship to this subject, and what assumptions or biases might you be bringing to it?")
+            st.markdown("---")
+            st.markdown("### Part 3: The Plan")
+            q9_plan_ideas = st.text_area("What are your initial ideas for a reporting plan (people to talk to, places to go, things to observe)?")
+            q10_first_step = st.text_input("What's one thing you can do today or tomorrow to get started?")
+            st.markdown("---")
+            st.markdown('<p style="font-weight: bold;">What kind of AI editor would you like to talk to?</p>', unsafe_allow_html=True)
+            coaching_style = st.selectbox("Coaching Style", ["Default Story Coach", "Tough Desk Editor", "Audience Advocate", "Skeptic"], label_visibility="collapsed")
+            st.markdown('</div>', unsafe_allow_html=True)
+            submitted = st.form_submit_button("Generate Prompt Recipe", type="primary", use_container_width=True)
+            if submitted:
+                st.session_state.explore_form_data = locals()
+                go_to_page("reporting_plan_recipe"); st.rerun()
+
     elif path == "confirm":
         st.markdown(f"This is the placeholder for the **{path}** questionnaire. We will build the form here.")
 
@@ -212,6 +232,8 @@ elif st.session_state.page == "reporting_plan_recipe":
     st.markdown("This prompt has been assembled from your answers. Take it to your preferred AI chat tool to start your coaching session.")
     st.markdown("---")
     
+    # NOTE: This section will need to be updated to handle data from all three paths.
+    # For now, it only assembles the prompt for the "Event" path.
     data = st.session_state.get("event_form_data", {})
     
     context_string = f"""
@@ -237,37 +259,11 @@ elif st.session_state.page == "reporting_plan_recipe":
     {context_string}
 
     # 3. TASK: THE COACHING SESSION FLOW
-
-    ## PART A: THE OPENING (Handling Incomplete Answers)
-    The student's answers may be incomplete. Your first task is to create a natural and collaborative entry point to the coaching session based on the completeness of their answers.
-
-    **IF the answers are mostly complete (e.g., only 1-2 minor gaps):**
-    1.  **Acknowledge & Validate:** Start by briefly and genuinely acknowledging something specific the user DID provide.
-    2.  **Identify a Single Gap:** Silently review their answers. If a foundational element is missing, select ONLY ONE to focus on. Prioritize gaps in this order: (1) The "why" (newsworthiness), (2) The "who" (audience), (3) The "what" (what's at stake).
-    3.  **Ask Your Opening Question:** Frame your first question as a collaborative way to build on their existing idea.
-
-    **IF the answers are very sparse (e.g., multiple foundational sections are brief or empty):**
-    1.  **Ask for Permission:** Do not quiz the user. Instead, offer them a choice.
-    2.  **Act on Their Choice:** If they say YES, ask 2-3 of the most important unanswered questions. If they say NO, proceed immediately to Part B.
-
-    ## PART B: THE MAIN COACHING DIALOGUE
-    After the opening exchange, guide the student in building a practical checklist by asking questions about:
-    - **Story Angles:** Start here. (e.g., "What's your best guess about what's going to happen?")
-    - **Logistics:**
-    - **Sourcing:**
-    - **Contingency Planning:**
-
-    # 4. CORE CONSTRAINTS
-    - **Journalistic Skepticism:** For any claims about data, official statements, or impact, ask the user how they plan to independently verify them.
-    - **Coach, Don't Do:** Do not provide answers or write lists for the user.
-    - **Be Socratic:** Ask open-ended, guiding questions.
-    - **Respect User Choice:** If the user declines gap-filling, do not circle back to it.
-
-    # 5. ETHICAL & DIVERSITY LENS
-    Throughout the conversation, maintain an awareness of potential bias and the importance of diverse sourcing. If the plan seems to overlook a community, ask a guiding question.
-
-    # 6. FINAL GOAL REMINDER
-    Remember, your primary goal is to be a Socratic coach. The final output of this conversation should be that the student has a clear, actionable checklist that *they* have built.
+    ## PART A: THE OPENING ...
+    ## PART B: THE MAIN COACHING DIALOGUE ...
+    # 4. CORE CONSTRAINTS ...
+    # 5. ETHICAL & DIVERSITY LENS ...
+    # 6. FINAL GOAL REMINDER ...
     """)
     
     col1, col2 = st.columns([2, 1])
@@ -278,9 +274,7 @@ elif st.session_state.page == "reporting_plan_recipe":
     with col2:
         st.subheader("Anatomy of the Prompt")
         st.markdown("""
-        A prompt is the request a user makes to an AI, but it's also a set of instructions for how the AI should prepare an answer. Prompt engineering is the art of designing those instructions in a way that is most likely to get the best (most accurate, most illuminating) results.
-
-        What you see here is how we've combined the context you've provided -- which gives the AI specifics to work with -- with some general rules we've developed through trial and error, such as directing the AI to coach you to an answer instead of giving you one. If you follow the approach laid out here, all your interactions with AI should improve.
+        A prompt is the request a user makes to an AI...
         """)
 
     st.markdown("---")

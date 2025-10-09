@@ -1,4 +1,5 @@
-# v19.2 - COMPLETE: All paths functional, all prompts integrated, all pages working.
+# v19.3 - PART 1 OF 2 - Bug fixes per ChatGPT code review
+# Fixes: Coaching style capture bug, locals() replacement, guards, consistency
 import streamlit as st
 import textwrap
 
@@ -85,14 +86,14 @@ if st.session_state.page == "portal":
     with col1:
         if st.button("Prepare a story pitch", type="primary", use_container_width=True):
             go_to_page("questionnaire"); st.rerun()
-        st.button("Structure a first draft", disabled=True, use_container_width=True)
+        st.button("Structure a first draft", disabled=True, use_container_width=True, help="Coming soon")
     with col2:
         if st.button("Get Ready to Report", type="primary", use_container_width=True):
             go_to_page("grr_choice"); st.rerun()
-        st.button("Vet a source", disabled=True, use_container_width=True)
+        st.button("Vet a source", disabled=True, use_container_width=True, help="Coming soon")
     with col3:
-        st.button("Develop interview questions", disabled=True, use_container_width=True)
-        st.button("Check your facts", disabled=True, use_container_width=True)
+        st.button("Develop interview questions", disabled=True, use_container_width=True, help="Coming soon")
+        st.button("Check your facts", disabled=True, use_container_width=True, help="Coming soon")
 
     st.markdown("---")
 
@@ -176,11 +177,29 @@ elif st.session_state.page == "reporting_plan_questionnaire":
             q11_work_left = st.text_area("What is the key work left to do -- what documents to read or people to interview?")
             q12_anxious_excited = st.text_area("Is there anything about this subject that makes you especially excited or anxious about covering it?")
             st.markdown("---")
-            st.radio("What kind of AI editor would you like to talk to?", ["Default Story Coach", "Tough Desk Editor", "Audience Advocate", "Skeptic"], key="coaching_style", horizontal=True)
+            event_coaching_style = st.radio(
+                "What kind of AI editor would you like to talk to?",
+                ["Default Story Coach", "Tough Desk Editor", "Audience Advocate", "Skeptic"],
+                horizontal=True
+            )
             st.markdown('</div>', unsafe_allow_html=True)
             submitted = st.form_submit_button("Generate Prompt Recipe", type="primary", use_container_width=True)
             if submitted:
-                st.session_state.form_data = locals()
+                st.session_state.form_data = {
+                    'q1_headline': q1_headline,
+                    'q2_where_when': q2_where_when,
+                    'q3_key_people': q3_key_people,
+                    'q4_why_now': q4_why_now,
+                    'q5_how_big': q5_how_big,
+                    'q6_important': q6_important,
+                    'q7_audience': q7_audience,
+                    'q8_work_done': q8_work_done,
+                    'q9_prior_coverage': q9_prior_coverage,
+                    'q10_prior_coverage_effect': q10_prior_coverage_effect,
+                    'q11_work_left': q11_work_left,
+                    'q12_anxious_excited': q12_anxious_excited,
+                    'coaching_style': event_coaching_style,
+                }
                 st.session_state.reporting_path = 'event'
                 go_to_page("reporting_plan_recipe"); st.rerun()
 
@@ -205,11 +224,27 @@ elif st.session_state.page == "reporting_plan_questionnaire":
             q9_plan_ideas = st.text_area("What are your initial ideas for a reporting plan (people to talk to, places to go, things to observe)?")
             q10_first_step = st.text_input("What's one thing you can do today or tomorrow to get started?")
             st.markdown("---")
-            st.radio("What kind of AI editor would you like to talk to?", ["Default Story Coach", "Tough Desk Editor", "Audience Advocate", "Skeptic"], key="coaching_style", horizontal=True)
+            explore_coaching_style = st.radio(
+                "What kind of AI editor would you like to talk to?",
+                ["Default Story Coach", "Tough Desk Editor", "Audience Advocate", "Skeptic"],
+                horizontal=True
+            )
             st.markdown('</div>', unsafe_allow_html=True)
             submitted = st.form_submit_button("Generate Prompt Recipe", type="primary", use_container_width=True)
             if submitted:
-                st.session_state.form_data = locals()
+                st.session_state.form_data = {
+                    'q1_territory': q1_territory,
+                    'q2_hunch': q2_hunch,
+                    'q3_curiosity': q3_curiosity,
+                    'q4_audience': q4_audience,
+                    'q5_know': q5_know,
+                    'q6_dont_know': q6_dont_know,
+                    'q7_prior_coverage': q7_prior_coverage,
+                    'q8_relationship_bias': q8_relationship_bias,
+                    'q9_plan_ideas': q9_plan_ideas,
+                    'q10_first_step': q10_first_step,
+                    'coaching_style': explore_coaching_style,
+                }
                 st.session_state.reporting_path = 'explore'
                 go_to_page("reporting_plan_recipe"); st.rerun()
 
@@ -224,11 +259,22 @@ elif st.session_state.page == "reporting_plan_questionnaire":
             q4_evidence = st.text_area("The Evidence: What would you need to learn to make you comfortable going with the story, and what information would lead you to conclude it's a dead end? What people or documents do you think could provide that evidence one way or the other?")
             q5_risks = st.text_area("The Risks: What worries you most about this story? What else could be going on? Are there any obvious concerns about privacy or harm to sources or other ethical concerns?")
             st.markdown("---")
-            st.radio("What kind of AI editor would you like to talk to?", ["Default Story Coach", "Tough Desk Editor", "Audience Advocate", "Skeptic"], key="coaching_style", horizontal=True)
+            confirm_coaching_style = st.radio(
+                "What kind of AI editor would you like to talk to?",
+                ["Default Story Coach", "Tough Desk Editor", "Audience Advocate", "Skeptic"],
+                horizontal=True
+            )
             st.markdown('</div>', unsafe_allow_html=True)
             submitted = st.form_submit_button("Generate Prompt Recipe", type="primary", use_container_width=True)
             if submitted:
-                st.session_state.form_data = locals()
+                st.session_state.form_data = {
+                    'q1_claim': q1_claim,
+                    'q2_source': q2_source,
+                    'q3_stakes': q3_stakes,
+                    'q4_evidence': q4_evidence,
+                    'q5_risks': q5_risks,
+                    'coaching_style': confirm_coaching_style,
+                }
                 st.session_state.reporting_path = 'confirm'
                 go_to_page("reporting_plan_recipe"); st.rerun()
 
@@ -240,19 +286,28 @@ elif st.session_state.page == "reporting_plan_questionnaire":
 # Page 1.7: Get Ready to Report - Recipe
 # =========================
 elif st.session_state.page == "reporting_plan_recipe":
+    # Guard against landing here without a path selected
+    path = st.session_state.get("reporting_path")
+    if not path:
+        st.warning("⚠️ No reporting path selected. Please go back and choose a path.", icon="⚠️")
+        if st.button("← Back to Get Ready to Report"):
+            go_to_page("grr_choice"); st.rerun()
+        st.stop()
+    
     st.title("Your Custom Reporting Plan Prompt 📝")
     st.markdown("This prompt has been assembled from your answers. Take it to your preferred AI chat tool to start your coaching session.")
     st.markdown("---")
     
-    path = st.session_state.get("reporting_path")
     context_string = ""
     final_prompt = ""
-    data = {}
-    
+    data = st.session_state.get("form_data", {})
+
+# END OF PART 1 - Continue to Part 2 for prompt generation and remaining pages
+# v19.3 - PART 2 OF 2 - Continuation from line 305
+# This file continues from where Part 1 ended
+
     # --- Logic for EVENT path ---
     if path == "event":
-        data = st.session_state.get("form_data", {})
-        
         context_string = f"""
 - Headline/Tweet: {data.get('q1_headline', 'N/A')}
 - Where & When: {data.get('q2_where_when', 'N/A')}
@@ -296,7 +351,7 @@ elif st.session_state.page == "reporting_plan_recipe":
         2.  **Identify a Single Gap:** Silently review their answers. If a foundational element is missing, select ONLY ONE to focus on. Prioritize gaps in this order: (1) The "why" (newsworthiness), (2) The "who" (audience), (3) The "what" (what's at stake).
         3.  **Ask Your Opening Question:** Frame your first question as a collaborative way to build on their existing idea.
         **IF the answers are very sparse (e.g., multiple foundational sections are brief or empty):**
-        1.  **Ask for Permission:** Do not quiz the user. Instead, offer them a choice.
+        1.  **Ask for Permission:** Do not quiz the user. Instead, offer them a choice: "I notice several key areas could use more detail. Would you like me to ask a few clarifying questions to help us build a stronger plan, or would you prefer to dive straight into the coaching?"
         2.  **Act on Their Choice:** If they say YES, ask 2-3 of the most important unanswered questions. If they say NO, proceed immediately to Part B.
 
         ## PART B: THE MAIN COACHING DIALOGUE
@@ -308,7 +363,7 @@ elif st.session_state.page == "reporting_plan_recipe":
 
         # 4. CORE CONSTRAINTS
         - **Journalistic Skepticism:** For any claims, ask the user how they plan to independently verify them.
-        - **Coach, Don't Do:** Do not provide answers or write lists for the user.
+        - **Coach, Don't Do:** Do not provide answers or write lists for the user. Do not name specific people or institutions.
         - **Be Socratic:** Ask open-ended, guiding questions.
         - **Respect User Choice:** If the user declines gap-filling, do not circle back to it.
 
@@ -321,8 +376,6 @@ elif st.session_state.page == "reporting_plan_recipe":
     
     # --- Logic for EXPLORE path ---
     elif path == "explore":
-        data = st.session_state.get("form_data", {})
-        
         context_string = f"""
 - Territory: {data.get('q1_territory', 'N/A')}
 - Guiding Hunch: {data.get('q2_hunch', 'N/A')}
@@ -359,8 +412,10 @@ elif st.session_state.page == "reporting_plan_recipe":
         # 3. TASK: THE COACHING SESSION FLOW
         ## PART A: THE OPENING (Handling Incomplete Answers)
         The student's answers may be incomplete. Your first task is to create a natural and collaborative entry point to the coaching session based on the completeness of their answers.
-        **IF the answers are very sparse...** ask for permission to clarify.
-        **IF the answers are mostly complete...** acknowledge their input, identify a single prioritized gap, and ask one collaborative opening question.
+        **IF the answers are very sparse (multiple sections empty or vague):**
+        Ask for permission: "I notice several areas could use more detail. Would you like me to ask a few clarifying questions first, or should we dive into exploring this territory together?"
+        **IF the answers are mostly complete (only 1-2 gaps):**
+        Acknowledge their input warmly, identify a single prioritized gap (Priority: 1. The hunch/angle, 2. Their relationship to the subject, 3. The audience), and ask one collaborative opening question.
 
         ## PART B: THE EXPLORATORY DIALOGUE (Approx. 3 Turns)
         After the opening, your goal is to help the student broaden their thinking. Ask open-ended, curious questions about their hunch, potential characters/groups, or sources of tension. Do NOT try to narrow them down to a specific story yet. After approximately 3 question-and-answer exchanges, move to Part C.
@@ -380,7 +435,7 @@ elif st.session_state.page == "reporting_plan_recipe":
 
         # 4. CORE CONSTRAINTS
         - **Journalistic Skepticism:** For any claims or assumptions, ask the user how they might test or verify them. Apply this gently during the exploratory phase.
-        - **Coach, Don't Do:** Do not suggest specific story angles during the exploratory phase.
+        - **Coach, Don't Do:** Do not suggest specific story angles during the exploratory phase. Do not name specific people or institutions.
         - **Respect the Process:** The goal of an "Explore" story is discovery. Do not force the user to a specific angle before they are ready. All three outcomes at the "Choice Point" are valid.
 
         # 5. ETHICAL & DIVERSITY LENS
@@ -392,8 +447,6 @@ elif st.session_state.page == "reporting_plan_recipe":
 
     # --- Logic for CONFIRM path ---
     elif path == "confirm":
-        data = st.session_state.get("form_data", {})
-        
         context_string = f"""
 - The Claim: {data.get('q1_claim', 'N/A')}
 - The Source: {data.get('q2_source', 'N/A')}
@@ -425,8 +478,10 @@ elif st.session_state.page == "reporting_plan_recipe":
         # 3. TASK: THE COACHING SESSION FLOW
         ## PART A: THE OPENING (Handling Incomplete Answers)
         The student's answers may be incomplete. Your first task is to create a natural and collaborative entry point to the coaching session based on the completeness of their answers.
-        **IF the answers are mostly complete...** acknowledge their input, identify a single prioritized gap (Priority: 1. The Evidence, 2. The Source, 3. The Stakes), and ask one collaborative opening question.
-        **IF the answers are very sparse...** ask for permission to clarify before proceeding.
+        **IF the answers are mostly complete (only 1-2 gaps):**
+        Acknowledge their input, identify a single prioritized gap (Priority: 1. The Evidence, 2. The Source, 3. The Stakes), and ask one collaborative opening question.
+        **IF the answers are very sparse (multiple sections empty):**
+        Ask for permission: "I see several key details are missing. Would you like me to ask a few clarifying questions to help us build a verification plan, or should we work with what we have?"
 
         ## PART B: THE VERIFICATION STRATEGY
         After the opening, your main goal is to guide the student in building a checklist for proving or disproving the claim. The conversation should be procedural and evidence-focused. Ask Socratic questions to help them think through:
@@ -441,7 +496,7 @@ elif st.session_state.page == "reporting_plan_recipe":
         - **Assume Nothing:** Your default stance is that the claim is unproven.
         - **Triangulate Everything:** Constantly push for multiple sources of evidence (human, documentary, etc.).
         - **Focus on Methodology:** The coaching should be about the *process* of verification, not the narrative of the story.
-        - **Coach, Don't Investigate:** Do not suggest specific sources by name or offer to search for documents. Ask questions that help the user identify these things themselves.
+        - **Coach, Don't Investigate:** Do not suggest specific sources by name or offer to search for documents. Do not name specific people or institutions. Ask questions that help the user identify these things themselves.
 
         # 5. FINAL GOAL REMINDER
         Remember, your primary goal is to build a verification plan. A successful outcome is a clear checklist for the student. The final story might confirm the claim, debunk it, or conclude that it's unverifiable. All are valid journalistic outcomes.
@@ -514,7 +569,11 @@ elif st.session_state.page == "questionnaire":
             
         reporting_stage = st.selectbox("How far along are you?", ["Just an idea", "Some reporting done", "Drafting in progress"])
         st.subheader("Coaching Preferences")
-        coaching_style = st.radio("What kind of AI editor would you like to talk to?", ["Default Story Coach", "Tough Desk Editor", "Audience Advocate", "Skeptic"], horizontal=True)
+        pitch_coaching_style = st.radio(
+            "What kind of AI editor would you like to talk to?",
+            ["Default Story Coach", "Tough Desk Editor", "Audience Advocate", "Skeptic"],
+            horizontal=True
+        )
         
         st.markdown('</div>', unsafe_allow_html=True)
         submitted = st.form_submit_button("Generate Prompt Recipe", type="primary", use_container_width=True)
@@ -522,7 +581,18 @@ elif st.session_state.page == "questionnaire":
             if not pitch_text or not pitch_text.strip():
                 st.error("Please paste your story pitch before submitting.")
             else:
-                st.session_state.form_data = locals()
+                st.session_state.form_data = {
+                    'pitch_text': pitch_text,
+                    'story_type_choice': story_type_choice,
+                    'prior_coverage': prior_coverage,
+                    'prior_coverage_effect': prior_coverage_effect,
+                    'working_headline': working_headline,
+                    'key_conflict': key_conflict,
+                    'target_audience': target_audience,
+                    'sources': sources,
+                    'reporting_stage': reporting_stage,
+                    'coaching_style': pitch_coaching_style,
+                }
                 go_to_page("recipe"); st.rerun()
     if st.button("← Back to Portal"):
         go_to_page("portal"); st.rerun()
@@ -595,7 +665,7 @@ elif st.session_state.page == "recipe":
     Based on their choice, guide them accordingly. If they choose A, shift to helping them build a reporting checklist. If B or C, help them refine or pivot.
 
     # 5. CORE CONSTRAINTS (Always Apply)
-    - **Guide, Don't Write:** Never write their pitch for them. Ask questions that lead them to solutions.
+    - **Guide, Don't Write:** Never write their pitch for them. Ask questions that lead them to solutions. Do not name specific people or institutions.
     - **Method Over Persona:** Your role is more "methodology coach" than "personality." The assigned style ("{data.get('coaching_style', 'Default Story Coach')}") changes tone, not mission.
     - **Political/Data Hygiene:** If the pitch involves political claims or data, probe for verification plans. Don't assume their facts are correct.
     - **Final Reminder:** Your job is to make them a better journalist, not to make this specific pitch perfect. Sometimes the best outcome is realizing it's not the right story.
@@ -723,3 +793,6 @@ elif st.session_state.page == "follow_on":
     with colb2:
         if st.button("← Back to Portal", use_container_width=True):
             go_to_page("portal"); st.rerun()
+
+# END OF v19.3 - All pages complete
+# To use: Concatenate Part 1 and Part 2 (remove the "# v19.3 - PART 2 OF 2" header from Part 2)

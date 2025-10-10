@@ -1,4 +1,4 @@
-# v21.1 - Fixed CSS: Removed purple background, increased type sizes, fixed white bars
+# v21.2 - All fixes applied: ChatGPT bugs + vertical spacing compression
 import streamlit as st
 import textwrap
 
@@ -33,17 +33,7 @@ st.markdown("""
         overflow: hidden;
     }
     
-    .portal-header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 300px;
-        height: 300px;
-        background: rgba(255,255,255,0.05);
-        border-radius: 50%;
-        transform: translate(30%, -30%);
-    }
+    /* REMOVED: Purple decorative bar (::before pseudo-element) */
     
     .portal-header h1 {
         font-size: 2.5rem;
@@ -54,10 +44,11 @@ st.markdown("""
     }
     
     .portal-subtitle {
-        font-size: 1.2rem;  /* FIXED: Increased from 1.15rem */
+        font-size: 1.2rem;
         opacity: 0.95;
         position: relative;
         z-index: 1;
+        margin-bottom: 0;  /* FIXED: Remove gap below subtitle */
     }
     
     /* How It Works Section - FIXED: White background with shadow */
@@ -70,13 +61,13 @@ st.markdown("""
     }
     
     .how-it-works-box p {
-        font-size: 1rem;  /* FIXED: Added explicit sizing */
+        font-size: 1rem;
         line-height: 1.6;
     }
     
     /* Caveat Section - Subdued */
     .caveat-box {
-        background: #f8fafc;  /* FIXED: Kept light gray to differentiate */
+        background: #f8fafc;
         border-radius: 12px;
         padding: 1.25rem;
         margin-bottom: 1.5rem;
@@ -84,7 +75,7 @@ st.markdown("""
     }
     
     .caveat-box p {
-        font-size: 0.95rem;  /* FIXED: Increased from 0.9rem */
+        font-size: 0.95rem;
         line-height: 1.6;
     }
     
@@ -98,7 +89,7 @@ st.markdown("""
     
     .workflow-step {
         text-align: center;
-        padding: 1.25rem 1rem;  /* FIXED: Increased from 1rem */
+        padding: 1.25rem 1rem;
         background: white;
         border-radius: 10px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -110,12 +101,12 @@ st.markdown("""
     }
     
     .workflow-step h4 {
-        font-size: 1rem;  /* FIXED: Increased from 0.9rem */
+        font-size: 1rem;
         margin-bottom: 0.5rem;
     }
     
     .workflow-step p {
-        font-size: 0.9rem;  /* FIXED: Increased from 0.8rem */
+        font-size: 0.9rem;
         line-height: 1.5;
     }
     
@@ -132,7 +123,7 @@ st.markdown("""
         align-items: center;
         gap: 1rem;
         background: white;
-        padding: 1rem;  /* FIXED: Increased from 0.85rem */
+        padding: 1rem;
         border-radius: 10px;
         margin-bottom: 1.5rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -141,7 +132,7 @@ st.markdown("""
     .inline-selector label {
         white-space: nowrap;
         font-weight: 600;
-        font-size: 1rem;  /* FIXED: Added explicit sizing */
+        font-size: 1rem;
         color: #475569;
     }
     
@@ -159,7 +150,7 @@ st.markdown("""
     
     .stMarkdown h3 {
         font-size: 1.4rem;
-        margin-top: 1.5rem;
+        margin-top: 0.75rem;  /* FIXED: Reduced from 1.5rem */
         margin-bottom: 1rem;
     }
     
@@ -227,14 +218,13 @@ if "journalism_level" not in st.session_state:
 # Page 1: The Portal
 # =========================
 if st.session_state.page == "portal":
-    # Header
+    # Header - REMOVED decorative purple bar
     st.markdown('<div class="portal-header">', unsafe_allow_html=True)
     st.markdown('<h1>🛠️ Journalist\'s Toolkit</h1>', unsafe_allow_html=True)
     st.markdown('<p class="portal-subtitle">AI-powered coaching tools designed to stand in for an editor, help you think like a journalist and strengthen your work.</p>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Reduced top padding
-    st.markdown('<div style="padding: 1.75rem 0 0 0;">', unsafe_allow_html=True)
+    # FIXED: Removed padding wrapper that created white gap
     
     # How It Works
     st.markdown('<div class="how-it-works-box">', unsafe_allow_html=True)
@@ -279,10 +269,10 @@ if st.session_state.page == "portal":
     
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Caveat Section
+    # Caveat Section - FIXED: Removed bracket spacing
     st.markdown('<div class="caveat-box">', unsafe_allow_html=True)
     st.markdown("""
-    <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem;">
+    <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.5rem;">
         <div style="background: white; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; border: 2px solid #cbd5e1;">📋</div>
         <h3 style="color: #475569; font-size: 1.1rem; margin: 0;">Copy and Paste, Huh?</h3>
     </div>
@@ -290,7 +280,7 @@ if st.session_state.page == "portal":
     st.markdown('<p style="color: #475569; font-size: 0.95rem; line-height: 1.6; margin: 0;"><strong>Yes!</strong> This tool works with other tools—it generates smart prompts that set up great discussions in whatever AI model you prefer. This does add a step. But here\'s why that\'s a deliberate choice: Working this way makes the tool <strong>always free</strong>, lets you <strong>choose</strong> the model you trust most and gives <strong>better performance</strong> than you\'d get from an API version.</p>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Get Started
+    # Get Started - FIXED: Reduced spacing above
     st.markdown("### Get Started")
     
     # Inline level selector
@@ -306,33 +296,35 @@ if st.session_state.page == "portal":
     
     st.markdown('<p style="color: #475569; margin: 1rem 0 1rem 0; font-weight: 600;">Now, choose a task:</p>', unsafe_allow_html=True)
     
-    # Task Grid - 2 columns
+    # Task Grid - 2 columns - FIXED: Simple labels with help tooltips
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("**Prepare a Story Pitch**\n\nGet coaching on your story idea before you pitch it", use_container_width=True, type="primary"):
+        if st.button("Prepare a Story Pitch", use_container_width=True, type="primary", help="Get coaching on your story idea before you pitch it"):
             go_to_page("questionnaire")
-        if st.button("**Develop Interview Questions**\n\nCraft better questions for your sources", disabled=True, use_container_width=True, help="Coming soon"):
+        if st.button("Develop Interview Questions", disabled=True, use_container_width=True, help="Coming soon - Craft better questions for your sources"):
             pass
-        if st.button("**Vet a Source**\n\nEvaluate reliability and potential bias", disabled=True, use_container_width=True, help="Coming soon"):
+        if st.button("Vet a Source", disabled=True, use_container_width=True, help="Coming soon - Evaluate reliability and potential bias"):
             pass
     
     with col2:
-        if st.button("**Get Ready to Report**\n\nBuild a preparation plan for events, explorations, or verification", use_container_width=True, type="primary"):
+        if st.button("Get Ready to Report", use_container_width=True, type="primary", help="Build a preparation plan for events, explorations, or verification"):
             go_to_page("grr_choice")
-        if st.button("**Structure a First Draft**\n\nGet guidance on organizing your story", disabled=True, use_container_width=True, help="Coming soon"):
+        if st.button("Structure a First Draft", disabled=True, use_container_width=True, help="Coming soon - Get guidance on organizing your story"):
             pass
-        if st.button("**Check Your Facts**\n\nBuild a verification strategy", disabled=True, use_container_width=True, help="Coming soon"):
+        if st.button("Check Your Facts", disabled=True, use_container_width=True, help="Coming soon - Build a verification strategy"):
             pass
     
     # Feedback Button
     st.markdown('<div class="feedback-center">', unsafe_allow_html=True)
-    st.link_button("💬 Tell Us What You Think", url="mailto:johncjm@gmail.com?subject=Journalist's Toolkit Feedback&body=Please share your feedback here:", use_container_width=False, type="secondary")
+    st.link_button("💬 Tell Us What You Think", url="mailto:johncjm@gmail.com?subject=Journalist%27s%20Toolkit%20Feedback&body=Please%20share%20your%20feedback%20here%3A", use_container_width=False, type="secondary")
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Footer CTA
     st.info("🤔 **Looking for a Different Kind of Collaboration?**\n\nTest whether three AI models working together produce better results than one. Team of Rivals brings ChatGPT, Claude, and Gemini together for multi-round discussions.", icon="💡")
     st.link_button("Try Team of Rivals →", url="https://team-of-rivals-tor1-beta.streamlit.app/", use_container_width=False)
-    # =========================
+
+
+# =========================
 # Page 1.5: Get Ready to Report – Choice
 # =========================
 elif st.session_state.page == "grr_choice":
@@ -509,7 +501,8 @@ elif st.session_state.page == "reporting_plan_questionnaire":
     st.markdown("---")
     if st.button("← Back to Choices"):
         go_to_page("grr_choice")
-        # =========================
+
+# =========================
 # Page 1.7: Get Ready to Report - Recipe
 # =========================
 elif st.session_state.page == "reporting_plan_recipe":
@@ -825,7 +818,8 @@ elif st.session_state.page == "questionnaire":
                 go_to_page("recipe")
     if st.button("← Back to Portal"):
         go_to_page("portal")
-        # =========================
+
+# =========================
 # Page 3: Prompt Recipe (STORY PITCH)
 # =========================
 elif st.session_state.page == "recipe":
@@ -1024,7 +1018,7 @@ elif st.session_state.page == "follow_on":
     col_fb1, col_fb2, col_fb3 = st.columns([1, 2, 1])
     with col_fb2:
         st.link_button("💬 Tell Us What You Think", 
-               url="mailto:johncjm@gmail.com?subject=Journalist's Toolkit Feedback&body=Please share your feedback here:", 
+               url="mailto:johncjm@gmail.com?subject=Journalist%27s%20Toolkit%20Feedback&body=Please%20share%20your%20feedback%20here%3A", 
                use_container_width=True,
                type="secondary")
 
@@ -1036,5 +1030,3 @@ elif st.session_state.page == "follow_on":
     with colb2:
         if st.button("← Back to Portal", use_container_width=True):
             go_to_page("portal")
-    
-    st.markdown('</div>', unsafe_allow_html=True)

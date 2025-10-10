@@ -280,7 +280,7 @@ if st.session_state.page == "portal":
     
     # Feedback Button
     st.markdown('<div class="feedback-center">', unsafe_allow_html=True)
-    st.link_button("💬 Tell Us What You Think", url="https://forms.gle/YOUR_FORM_ID", use_container_width=False)
+    st.link_button("💬 Tell Us What You Think", url="mailto:johncjm@gmail.com?subject=Journalist's Toolkit Feedback&body=Please share your feedback here:", use_container_width=False)
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Footer CTA
@@ -983,10 +983,10 @@ elif st.session_state.page == "follow_on":
     st.markdown("---")
     col_fb1, col_fb2, col_fb3 = st.columns([1, 2, 1])
     with col_fb2:
-        st.link_button("💬 Tell Us What You Think", 
-                       url="https://forms.gle/YOUR_FORM_ID", 
-                       use_container_width=True,
-                       type="secondary")
+    st.link_button("💬 Tell Us What You Think", 
+               url="mailto:johncjm@gmail.com?subject=Journalist's Toolkit Feedback&body=Please share your feedback here:", 
+               use_container_width=True,
+               type="secondary")
 
     st.markdown("---")
     colb1, colb2 = st.columns([1,1])

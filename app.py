@@ -983,7 +983,7 @@ elif st.session_state.page == "follow_on":
     st.markdown("---")
     col_fb1, col_fb2, col_fb3 = st.columns([1, 2, 1])
     with col_fb2:
-    st.link_button("💬 Tell Us What You Think", 
+        st.link_button("💬 Tell Us What You Think", 
                url="mailto:johncjm@gmail.com?subject=Journalist's Toolkit Feedback&body=Please share your feedback here:", 
                use_container_width=True,
                type="secondary")

@@ -1,4 +1,4 @@
-# v21.0 - Redesigned portal with compressed layout and improved CSS throughout
+# v21.1 - Fixed CSS: Removed purple background, increased type sizes, fixed white bars
 import streamlit as st
 import textwrap
 
@@ -8,13 +8,13 @@ st.set_page_config(page_title="Journalist's Toolkit", layout="wide")
 # --- CUSTOM CSS ---
 st.markdown("""
 <style>
-    /* Base Styling */
+    /* Base Styling - FIXED: Light gray instead of purple */
     .stApp {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #f8fafc;
     }
     
-    /* Card Component */
-    .card {
+    /* Card Component - FIXED: Renamed to content-card to avoid conflicts */
+    .content-card {
         background: white;
         padding: 2rem;
         border-radius: 12px;
@@ -54,30 +54,41 @@ st.markdown("""
     }
     
     .portal-subtitle {
-        font-size: 1.15rem;
+        font-size: 1.2rem;  /* FIXED: Increased from 1.15rem */
         opacity: 0.95;
         position: relative;
         z-index: 1;
     }
     
-    /* How It Works Section */
+    /* How It Works Section - FIXED: White background with shadow */
     .how-it-works-box {
-        background: #f8fafc;
+        background: white;
         border-radius: 12px;
         padding: 1.5rem;
         margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    
+    .how-it-works-box p {
+        font-size: 1rem;  /* FIXED: Added explicit sizing */
+        line-height: 1.6;
     }
     
     /* Caveat Section - Subdued */
     .caveat-box {
-        background: #f1f5f9;
+        background: #f8fafc;  /* FIXED: Kept light gray to differentiate */
         border-radius: 12px;
         padding: 1.25rem;
         margin-bottom: 1.5rem;
         border-left: 4px solid #64748b;
     }
     
-    /* Workflow Steps */
+    .caveat-box p {
+        font-size: 0.95rem;  /* FIXED: Increased from 0.9rem */
+        line-height: 1.6;
+    }
+    
+    /* Workflow Steps - FIXED: Increased padding and type sizes */
     .workflow-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -87,7 +98,7 @@ st.markdown("""
     
     .workflow-step {
         text-align: center;
-        padding: 1rem;
+        padding: 1.25rem 1rem;  /* FIXED: Increased from 1rem */
         background: white;
         border-radius: 10px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -98,6 +109,16 @@ st.markdown("""
         transform: translateY(-2px);
     }
     
+    .workflow-step h4 {
+        font-size: 1rem;  /* FIXED: Increased from 0.9rem */
+        margin-bottom: 0.5rem;
+    }
+    
+    .workflow-step p {
+        font-size: 0.9rem;  /* FIXED: Increased from 0.8rem */
+        line-height: 1.5;
+    }
+    
     /* Task Grid - 2 columns */
     .task-grid-2col {
         display: grid;
@@ -105,20 +126,22 @@ st.markdown("""
         gap: 1rem;
     }
     
-    /* Inline Level Selector */
+    /* Inline Level Selector - FIXED: White background with shadow */
     .inline-selector {
         display: flex;
         align-items: center;
         gap: 1rem;
-        background: #f1f5f9;
-        padding: 0.85rem 1rem;
+        background: white;
+        padding: 1rem;  /* FIXED: Increased from 0.85rem */
         border-radius: 10px;
         margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
     
     .inline-selector label {
         white-space: nowrap;
         font-weight: 600;
+        font-size: 1rem;  /* FIXED: Added explicit sizing */
         color: #475569;
     }
     
@@ -126,6 +149,23 @@ st.markdown("""
     .feedback-center {
         text-align: center;
         margin: 2rem 0 1.5rem 0;
+    }
+    
+    /* General text sizing improvements - FIXED: Added global rules */
+    .stMarkdown p {
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+    
+    .stMarkdown h3 {
+        font-size: 1.4rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* Button text should be readable */
+    .stButton button {
+        font-size: 0.95rem;
     }
     
     /* Mobile Responsiveness */
@@ -136,6 +176,12 @@ st.markdown("""
         .inline-selector {
             flex-direction: column;
             align-items: stretch;
+        }
+        .portal-header h1 {
+            font-size: 2rem;
+        }
+        .portal-subtitle {
+            font-size: 1.1rem;
         }
     }
 </style>
@@ -200,16 +246,16 @@ if st.session_state.page == "portal":
         st.markdown("""
         <div class="workflow-step">
             <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.6rem auto; font-weight: 700;">1</div>
-            <h4 style="font-size: 0.9rem; margin-bottom: 0.35rem;">Pick a Task</h4>
-            <p style="font-size: 0.8rem; color: #64748b; margin: 0;">Choose what you need help with (pitch, reporting, etc.)</p>
+            <h4 style="font-size: 1rem; margin-bottom: 0.5rem;">Pick a Task</h4>
+            <p style="font-size: 0.9rem; color: #64748b; margin: 0; line-height: 1.5;">Choose what you need help with (pitch, reporting, etc.)</p>
         </div>
         """, unsafe_allow_html=True)
     with col2:
         st.markdown("""
         <div class="workflow-step">
             <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.6rem auto; font-weight: 700;">2</div>
-            <h4 style="font-size: 0.9rem; margin-bottom: 0.35rem;">Answer Questions</h4>
-            <p style="font-size: 0.8rem; color: #64748b; margin: 0;">Think through the kind of questions an editor would ask</p>
+            <h4 style="font-size: 1rem; margin-bottom: 0.5rem;">Answer Questions</h4>
+            <p style="font-size: 0.9rem; color: #64748b; margin: 0; line-height: 1.5;">Think through the kind of questions an editor would ask</p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -218,16 +264,16 @@ if st.session_state.page == "portal":
         st.markdown("""
         <div class="workflow-step">
             <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.6rem auto; font-weight: 700;">3</div>
-            <h4 style="font-size: 0.9rem; margin-bottom: 0.35rem;">Get Your Prompt</h4>
-            <p style="font-size: 0.8rem; color: #64748b; margin: 0;">We generate expert coaching instructions for an AI</p>
+            <h4 style="font-size: 1rem; margin-bottom: 0.5rem;">Get Your Prompt</h4>
+            <p style="font-size: 0.9rem; color: #64748b; margin: 0; line-height: 1.5;">We generate expert coaching instructions for an AI</p>
         </div>
         """, unsafe_allow_html=True)
     with col4:
         st.markdown("""
         <div class="workflow-step">
             <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.6rem auto; font-weight: 700;">4</div>
-            <h4 style="font-size: 0.9rem; margin-bottom: 0.35rem;">Start the Coaching</h4>
-            <p style="font-size: 0.8rem; color: #64748b; margin: 0;">Copy the prompt into an AI model and begin a dialogue</p>
+            <h4 style="font-size: 1rem; margin-bottom: 0.5rem;">Start the Coaching</h4>
+            <p style="font-size: 0.9rem; color: #64748b; margin: 0; line-height: 1.5;">Copy the prompt into an AI model and begin a dialogue</p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -238,10 +284,10 @@ if st.session_state.page == "portal":
     st.markdown("""
     <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem;">
         <div style="background: white; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; border: 2px solid #cbd5e1;">📋</div>
-        <h3 style="color: #475569; font-size: 1.05rem; margin: 0;">Copy and Paste, Huh?</h3>
+        <h3 style="color: #475569; font-size: 1.1rem; margin: 0;">Copy and Paste, Huh?</h3>
     </div>
     """, unsafe_allow_html=True)
-    st.markdown('<p style="color: #475569; font-size: 0.9rem; line-height: 1.55; margin: 0;"><strong>Yes!</strong> This tool works with other tools—it generates smart prompts that set up great discussions in whatever AI model you prefer. This does add a step. But here\'s why that\'s a deliberate choice: Working this way makes the tool <strong>always free</strong>, lets you <strong>choose</strong> the model you trust most and gives <strong>better performance</strong> than you\'d get from an API version.</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #475569; font-size: 0.95rem; line-height: 1.6; margin: 0;"><strong>Yes!</strong> This tool works with other tools—it generates smart prompts that set up great discussions in whatever AI model you prefer. This does add a step. But here\'s why that\'s a deliberate choice: Working this way makes the tool <strong>always free</strong>, lets you <strong>choose</strong> the model you trust most and gives <strong>better performance</strong> than you\'d get from an API version.</p>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Get Started
@@ -280,17 +326,13 @@ if st.session_state.page == "portal":
     
     # Feedback Button
     st.markdown('<div class="feedback-center">', unsafe_allow_html=True)
-    st.link_button("💬 Tell Us What You Think", url="mailto:johncjm@gmail.com?subject=Journalist's Toolkit Feedback&body=Please share your feedback here:", use_container_width=False)
+    st.link_button("💬 Tell Us What You Think", url="mailto:johncjm@gmail.com?subject=Journalist's Toolkit Feedback&body=Please share your feedback here:", use_container_width=False, type="secondary")
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Footer CTA
     st.info("🤔 **Looking for a Different Kind of Collaboration?**\n\nTest whether three AI models working together produce better results than one. Team of Rivals brings ChatGPT, Claude, and Gemini together for multi-round discussions.", icon="💡")
     st.link_button("Try Team of Rivals →", url="https://team-of-rivals-tor1-beta.streamlit.app/", use_container_width=False)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-
-
-# =========================
+    # =========================
 # Page 1.5: Get Ready to Report – Choice
 # =========================
 elif st.session_state.page == "grr_choice":
@@ -344,7 +386,7 @@ elif st.session_state.page == "reporting_plan_questionnaire":
     if path == "event":
         st.markdown("To get you ready for this event, let's walk through the key questions an editor would ask.")
         with st.form("event_plan_form"):
-            st.markdown('<div class="card">', unsafe_allow_html=True)
+            st.markdown('<div class="content-card">', unsafe_allow_html=True)
             st.markdown("### Part 1: The Situation")
             q1_headline = st.text_input("What's happening -- how would you sum up the story in a headline or tweet?")
             q2_where_when = st.text_input("Where and when is it happening?")
@@ -393,7 +435,7 @@ elif st.session_state.page == "reporting_plan_questionnaire":
     elif path == "explore":
         st.markdown("This path helps you explore a topic when you have a hunch there's a story, but you're not sure what it is yet.")
         with st.form("explore_plan_form"):
-            st.markdown('<div class="card">', unsafe_allow_html=True)
+            st.markdown('<div class="content-card">', unsafe_allow_html=True)
             st.markdown("### Part 1: The Territory & The Angle")
             q1_territory = st.text_input("Describe what you want to explore (who, what, or where has your attention?).")
             q2_hunch = st.text_input("What's your hunch or guiding question about it?")
@@ -438,7 +480,7 @@ elif st.session_state.page == "reporting_plan_questionnaire":
     elif path == "confirm":
         st.markdown("This path helps you verify a specific claim, tip, or rumor.")
         with st.form("confirm_plan_form"):
-            st.markdown('<div class="card">', unsafe_allow_html=True)
+            st.markdown('<div class="content-card">', unsafe_allow_html=True)
             q1_claim = st.text_area("The Claim: What is the specific claim, tip, or rumor you are trying to verify? (State it as a single, testable sentence.)")
             q2_source = st.text_area("The Source: Where did this information come from, and what do you know about the source's reliability and potential motivations?")
             q3_stakes = st.text_area("The Stakes: Why does this story matter to your audience?")
@@ -467,8 +509,7 @@ elif st.session_state.page == "reporting_plan_questionnaire":
     st.markdown("---")
     if st.button("← Back to Choices"):
         go_to_page("grr_choice")
-
-# =========================
+        # =========================
 # Page 1.7: Get Ready to Report - Recipe
 # =========================
 elif st.session_state.page == "reporting_plan_recipe":
@@ -739,7 +780,7 @@ elif st.session_state.page == "questionnaire":
     st.title("Story Pitch Coach")
     st.markdown("Filling out this questionnaire helps you think through the key elements of your pitch...")
     with st.form("pitch_form"):
-        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown('<div class="content-card">', unsafe_allow_html=True)
         pitch_text = st.text_area("**Paste your story pitch here (Required):**", height=200)
         
         st.subheader("Pitch Details (Optional, but highly recommended)")
@@ -784,8 +825,7 @@ elif st.session_state.page == "questionnaire":
                 go_to_page("recipe")
     if st.button("← Back to Portal"):
         go_to_page("portal")
-
-# =========================
+        # =========================
 # Page 3: Prompt Recipe (STORY PITCH)
 # =========================
 elif st.session_state.page == "recipe":
@@ -915,7 +955,7 @@ elif st.session_state.page == "follow_on":
     st.markdown("Like a newsroom, a **second set of eyes** can reveal new angles and blind spots. Use the tools below to review your session.")
     st.markdown("---")
 
-    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="content-card">', unsafe_allow_html=True)
     st.header("Get a Second Set of Eyes on Your Workshop")
     
     st.subheader("Option 1: Ask the **Same** Coach for a Different Perspective")
@@ -970,7 +1010,7 @@ elif st.session_state.page == "follow_on":
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown("---")
 
-    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="content-card">', unsafe_allow_html=True)
     st.header("Self-Reflection")
     st.markdown("""
     - What was the single most useful question the coach asked?
@@ -996,3 +1036,5 @@ elif st.session_state.page == "follow_on":
     with colb2:
         if st.button("← Back to Portal", use_container_width=True):
             go_to_page("portal")
+    
+    st.markdown('</div>', unsafe_allow_html=True)

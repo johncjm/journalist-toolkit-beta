@@ -1,5 +1,4 @@
-# v19.3 - PART 1 OF 2 - Bug fixes per ChatGPT code review
-# Fixes: Coaching style capture bug, locals() replacement, guards, consistency
+# v21.0 - Redesigned portal with compressed layout and improved CSS throughout
 import streamlit as st
 import textwrap
 
@@ -9,12 +8,135 @@ st.set_page_config(page_title="Journalist's Toolkit", layout="wide")
 # --- CUSTOM CSS ---
 st.markdown("""
 <style>
+    /* Base Styling */
+    .stApp {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* Card Component */
     .card {
         background: white;
         padding: 2rem;
         border-radius: 12px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         margin-bottom: 2rem;
+    }
+    
+    /* Portal Page Specific */
+    .portal-header {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+        color: white;
+        padding: 2.5rem 2.5rem 1.75rem 2.5rem;
+        border-radius: 16px 16px 0 0;
+        margin: -1rem -1rem 0 -1rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .portal-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+        transform: translate(30%, -30%);
+    }
+    
+    .portal-header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.75rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .portal-subtitle {
+        font-size: 1.15rem;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* How It Works Section */
+    .how-it-works-box {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Caveat Section - Subdued */
+    .caveat-box {
+        background: #f1f5f9;
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #64748b;
+    }
+    
+    /* Workflow Steps */
+    .workflow-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .workflow-step {
+        text-align: center;
+        padding: 1rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        transition: transform 0.2s;
+    }
+    
+    .workflow-step:hover {
+        transform: translateY(-2px);
+    }
+    
+    /* Task Grid - 2 columns */
+    .task-grid-2col {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    /* Inline Level Selector */
+    .inline-selector {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: #f1f5f9;
+        padding: 0.85rem 1rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .inline-selector label {
+        white-space: nowrap;
+        font-weight: 600;
+        color: #475569;
+    }
+    
+    /* Feedback Button */
+    .feedback-center {
+        text-align: center;
+        margin: 2rem 0 1.5rem 0;
+    }
+    
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .workflow-grid, .task-grid-2col {
+            grid-template-columns: 1fr;
+        }
+        .inline-selector {
+            flex-direction: column;
+            align-items: stretch;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -23,6 +145,7 @@ st.markdown("""
 # --- HELPERS ---
 def go_to_page(page_name: str):
     st.session_state.page = page_name
+    st.rerun()
 
 def get_counter(text: str):
     words = len(text.split()) if text else 0
@@ -58,50 +181,113 @@ if "journalism_level" not in st.session_state:
 # Page 1: The Portal
 # =========================
 if st.session_state.page == "portal":
-    st.title("Welcome to the Journalist's Toolkit 🛠️")
-    st.subheader("A suite of tools designed to help you think like a journalist and strengthen your work by using AI as a coach.")
-    st.markdown("---")
-
-    st.markdown("""
-    Covering the news involves a wide range of tasks, from shaping a story idea to polishing copy for publication. We offer tools to help you learn those skills by working with AI models that will coach you rather than just doing the work for you.  
-
-    **Journalist's Toolkit works like this:**
-    * pick a task and think it through by answering the kinds of questions an editor would ask
-    * that info is combined with a "prompt" engineered to get the best out of an AI bot
-    * you take that prompt to a bot, which will guide you through a constructive discussion leading to a "next steps" plan 
-
-    Along the way, you'll gain insight into what AI bots do and don't do well, and how to get the most out of an AI collaboration.
-    """)
-    st.markdown("---")
-
-    st.session_state.journalism_level = st.selectbox(
-        "First, tell us what level of experience you're at:",
-        ["High School journalist", "Undergraduate journalist", "Grad school journalist", "Working journalist"]
-    )
-    st.markdown("Now, choose one of these tasks:")
+    # Header
+    st.markdown('<div class="portal-header">', unsafe_allow_html=True)
+    st.markdown('<h1>🛠️ Journalist\'s Toolkit</h1>', unsafe_allow_html=True)
+    st.markdown('<p class="portal-subtitle">AI-powered coaching tools designed to stand in for an editor, help you think like a journalist and strengthen your work.</p>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
     
-    st.header("📝 I've Got a Job to Do")
+    # Reduced top padding
+    st.markdown('<div style="padding: 1.75rem 0 0 0;">', unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns(3)
+    # How It Works
+    st.markdown('<div class="how-it-works-box">', unsafe_allow_html=True)
+    st.markdown("### How It Works")
+    st.markdown("Journalism requires many skills. We help you develop them by using AI as a coach rather than a shortcut.")
+    
+    col1, col2 = st.columns(2)
     with col1:
-        if st.button("Prepare a story pitch", type="primary", use_container_width=True):
-            go_to_page("questionnaire"); st.rerun()
-        st.button("Structure a first draft", disabled=True, use_container_width=True, help="Coming soon")
+        st.markdown("""
+        <div class="workflow-step">
+            <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.6rem auto; font-weight: 700;">1</div>
+            <h4 style="font-size: 0.9rem; margin-bottom: 0.35rem;">Pick a Task</h4>
+            <p style="font-size: 0.8rem; color: #64748b; margin: 0;">Choose what you need help with (pitch, reporting, etc.)</p>
+        </div>
+        """, unsafe_allow_html=True)
     with col2:
-        if st.button("Get Ready to Report", type="primary", use_container_width=True):
-            go_to_page("grr_choice"); st.rerun()
-        st.button("Vet a source", disabled=True, use_container_width=True, help="Coming soon")
+        st.markdown("""
+        <div class="workflow-step">
+            <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.6rem auto; font-weight: 700;">2</div>
+            <h4 style="font-size: 0.9rem; margin-bottom: 0.35rem;">Answer Questions</h4>
+            <p style="font-size: 0.8rem; color: #64748b; margin: 0;">Think through the kind of questions an editor would ask</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    col3, col4 = st.columns(2)
     with col3:
-        st.button("Develop interview questions", disabled=True, use_container_width=True, help="Coming soon")
-        st.button("Check your facts", disabled=True, use_container_width=True, help="Coming soon")
-
-    st.markdown("---")
-
-    st.info("Looking for a different kind of AI collaboration?", icon="🤔")
+        st.markdown("""
+        <div class="workflow-step">
+            <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.6rem auto; font-weight: 700;">3</div>
+            <h4 style="font-size: 0.9rem; margin-bottom: 0.35rem;">Get Your Prompt</h4>
+            <p style="font-size: 0.8rem; color: #64748b; margin: 0;">We generate expert coaching instructions for an AI</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col4:
+        st.markdown("""
+        <div class="workflow-step">
+            <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.6rem auto; font-weight: 700;">4</div>
+            <h4 style="font-size: 0.9rem; margin-bottom: 0.35rem;">Start the Coaching</h4>
+            <p style="font-size: 0.8rem; color: #64748b; margin: 0;">Copy the prompt into an AI model and begin a dialogue</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Caveat Section
+    st.markdown('<div class="caveat-box">', unsafe_allow_html=True)
     st.markdown("""
-    If you're looking to test the idea that three heads are better than one for deep strategic or coding questions, feel free to try the beta version of **Team of Rivals**. It brings ChatGPT, Claude, and Gemini together for multi-round discussions where the models can help protect you from each other's flaws and build on each other's strengths.
-    """)
-    st.link_button("Try Team of Rivals (opens new tab)", url="https://team-of-rivals-tor1-beta.streamlit.app/")
+    <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem;">
+        <div style="background: white; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; border: 2px solid #cbd5e1;">📋</div>
+        <h3 style="color: #475569; font-size: 1.05rem; margin: 0;">Copy and Paste, Huh?</h3>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown('<p style="color: #475569; font-size: 0.9rem; line-height: 1.55; margin: 0;"><strong>Yes!</strong> This tool works with other tools—it generates smart prompts that set up great discussions in whatever AI model you prefer. This does add a step. But here\'s why that\'s a deliberate choice: Working this way makes the tool <strong>always free</strong>, lets you <strong>choose</strong> the model you trust most and gives <strong>better performance</strong> than you\'d get from an API version.</p>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Get Started
+    st.markdown("### Get Started")
+    
+    # Inline level selector
+    col_label, col_select = st.columns([1, 3])
+    with col_label:
+        st.markdown('<p style="font-weight: 600; color: #475569; padding-top: 0.35rem; margin: 0;">Your experience level:</p>', unsafe_allow_html=True)
+    with col_select:
+        st.session_state.journalism_level = st.selectbox(
+            "level",
+            ["High School journalist", "Undergraduate journalist", "Grad school journalist", "Working journalist"],
+            label_visibility="collapsed"
+        )
+    
+    st.markdown('<p style="color: #475569; margin: 1rem 0 1rem 0; font-weight: 600;">Now, choose a task:</p>', unsafe_allow_html=True)
+    
+    # Task Grid - 2 columns
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("**Prepare a Story Pitch**\n\nGet coaching on your story idea before you pitch it", use_container_width=True, type="primary"):
+            go_to_page("questionnaire")
+        if st.button("**Develop Interview Questions**\n\nCraft better questions for your sources", disabled=True, use_container_width=True, help="Coming soon"):
+            pass
+        if st.button("**Vet a Source**\n\nEvaluate reliability and potential bias", disabled=True, use_container_width=True, help="Coming soon"):
+            pass
+    
+    with col2:
+        if st.button("**Get Ready to Report**\n\nBuild a preparation plan for events, explorations, or verification", use_container_width=True, type="primary"):
+            go_to_page("grr_choice")
+        if st.button("**Structure a First Draft**\n\nGet guidance on organizing your story", disabled=True, use_container_width=True, help="Coming soon"):
+            pass
+        if st.button("**Check Your Facts**\n\nBuild a verification strategy", disabled=True, use_container_width=True, help="Coming soon"):
+            pass
+    
+    # Feedback Button
+    st.markdown('<div class="feedback-center">', unsafe_allow_html=True)
+    st.link_button("💬 Tell Us What You Think", url="https://forms.gle/YOUR_FORM_ID", use_container_width=False)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Footer CTA
+    st.info("🤔 **Looking for a Different Kind of Collaboration?**\n\nTest whether three AI models working together produce better results than one. Team of Rivals brings ChatGPT, Claude, and Gemini together for multi-round discussions.", icon="💡")
+    st.link_button("Try Team of Rivals →", url="https://team-of-rivals-tor1-beta.streamlit.app/", use_container_width=False)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 # =========================
@@ -116,7 +302,7 @@ elif st.session_state.page == "grr_choice":
     with col1:
         if st.button("Event", use_container_width=True):
             st.session_state.reporting_path = "event"
-            go_to_page("reporting_plan_questionnaire"); st.rerun()
+            go_to_page("reporting_plan_questionnaire")
         st.markdown("**You know that something is going to happen that seems worth covering...**")
         with st.expander("Click for examples"):
             st.markdown("- A school board vote on a controversial policy")
@@ -126,7 +312,7 @@ elif st.session_state.page == "grr_choice":
     with col2:
         if st.button("Explore", use_container_width=True):
             st.session_state.reporting_path = "explore"
-            go_to_page("reporting_plan_questionnaire"); st.rerun()
+            go_to_page("reporting_plan_questionnaire")
         st.markdown("**You think there's something interesting to write about...**")
         with st.expander("Click for examples"):
             st.markdown("- Profiling a neighborhood or subculture")
@@ -136,7 +322,7 @@ elif st.session_state.page == "grr_choice":
     with col3:
         if st.button("Confirm", use_container_width=True):
             st.session_state.reporting_path = "confirm"
-            go_to_page("reporting_plan_questionnaire"); st.rerun()
+            go_to_page("reporting_plan_questionnaire")
         st.markdown("**You hear or have other reason to think that X has happened...**")
         with st.expander("Click for examples"):
             st.markdown("- A tip that a local restaurant is closing")
@@ -145,8 +331,8 @@ elif st.session_state.page == "grr_choice":
     
     st.markdown("---")
     if st.button("← Back to Portal"):
-        go_to_page("portal"); st.rerun()
-        
+        go_to_page("portal")
+
 # =========================
 # Page 1.6: Get Ready to Report - Questionnaire
 # =========================
@@ -201,7 +387,7 @@ elif st.session_state.page == "reporting_plan_questionnaire":
                     'coaching_style': event_coaching_style,
                 }
                 st.session_state.reporting_path = 'event'
-                go_to_page("reporting_plan_recipe"); st.rerun()
+                go_to_page("reporting_plan_recipe")
 
     # --- EXPLORE PATH ---
     elif path == "explore":
@@ -246,7 +432,7 @@ elif st.session_state.page == "reporting_plan_questionnaire":
                     'coaching_style': explore_coaching_style,
                 }
                 st.session_state.reporting_path = 'explore'
-                go_to_page("reporting_plan_recipe"); st.rerun()
+                go_to_page("reporting_plan_recipe")
 
     # --- CONFIRM PATH ---
     elif path == "confirm":
@@ -276,22 +462,25 @@ elif st.session_state.page == "reporting_plan_questionnaire":
                     'coaching_style': confirm_coaching_style,
                 }
                 st.session_state.reporting_path = 'confirm'
-                go_to_page("reporting_plan_recipe"); st.rerun()
+                go_to_page("reporting_plan_recipe")
 
     st.markdown("---")
     if st.button("← Back to Choices"):
-        go_to_page("grr_choice"); st.rerun()
+        go_to_page("grr_choice")
 
 # =========================
 # Page 1.7: Get Ready to Report - Recipe
 # =========================
 elif st.session_state.page == "reporting_plan_recipe":
+    # Scroll to top fix
+    st.components.v1.html("<script>window.scrollTo(0, 0);</script>", height=0)
+    
     # Guard against landing here without a path selected
     path = st.session_state.get("reporting_path")
     if not path:
         st.warning("⚠️ No reporting path selected. Please go back and choose a path.", icon="⚠️")
         if st.button("← Back to Get Ready to Report"):
-            go_to_page("grr_choice"); st.rerun()
+            go_to_page("grr_choice")
         st.stop()
     
     st.title("Your Custom Reporting Plan Prompt 📝")
@@ -301,10 +490,6 @@ elif st.session_state.page == "reporting_plan_recipe":
     context_string = ""
     final_prompt = ""
     data = st.session_state.get("form_data", {})
-
-# END OF PART 1 - Continue to Part 2 for prompt generation and remaining pages
-# v19.3 - PART 2 OF 2 - Continuation from line 305
-# This file continues from where Part 1 ended
 
     # --- Logic for EVENT path ---
     if path == "event":
@@ -531,6 +716,7 @@ elif st.session_state.page == "reporting_plan_recipe":
         """)
     
     st.markdown("---")
+    st.markdown("**💡 Tip:** These links are shortcuts—you can copy this prompt into *any* AI chat tool you prefer.")
     st.subheader("Start Your Coaching Session (opens a new tab)")
     c1, c2, c3 = st.columns(3)
     with c1:
@@ -542,12 +728,14 @@ elif st.session_state.page == "reporting_plan_recipe":
 
     st.markdown("---")
     if st.button("← Back to Questionnaire"):
-        go_to_page("reporting_plan_questionnaire"); st.rerun()
+        go_to_page("reporting_plan_questionnaire")
 
 # =========================
 # Page 2: Questionnaire (STORY PITCH)
 # =========================
 elif st.session_state.page == "questionnaire":
+    st.components.v1.html("<script>window.scrollTo(0, 0);</script>", height=0)
+    
     st.title("Story Pitch Coach")
     st.markdown("Filling out this questionnaire helps you think through the key elements of your pitch...")
     with st.form("pitch_form"):
@@ -593,14 +781,16 @@ elif st.session_state.page == "questionnaire":
                     'reporting_stage': reporting_stage,
                     'coaching_style': pitch_coaching_style,
                 }
-                go_to_page("recipe"); st.rerun()
+                go_to_page("recipe")
     if st.button("← Back to Portal"):
-        go_to_page("portal"); st.rerun()
+        go_to_page("portal")
 
 # =========================
 # Page 3: Prompt Recipe (STORY PITCH)
 # =========================
 elif st.session_state.page == "recipe":
+    st.components.v1.html("<script>window.scrollTo(0, 0);</script>", height=0)
+    
     st.title("Your Custom Prompt Recipe 📝")
     st.markdown("AI models work best when given well-structured prompts. This prompt combines your pitch with expert coaching instructions.")
     st.markdown("---")
@@ -699,6 +889,7 @@ elif st.session_state.page == "recipe":
         """)
         
     st.markdown("---")
+    st.markdown("**💡 Tip:** These links are shortcuts—you can copy this prompt into *any* AI chat tool you prefer.")
     st.subheader("Start Your Coaching Session (opens a new tab)")
     c1, c2, c3 = st.columns(3)
     with c1:
@@ -710,14 +901,16 @@ elif st.session_state.page == "recipe":
     
     st.markdown("---")
     if st.button("Continue to Next Steps →", type="primary"):
-        go_to_page("follow_on"); st.rerun()
+        go_to_page("follow_on")
     if st.button("← Back to Questionnaire"):
-        go_to_page("questionnaire"); st.rerun()
+        go_to_page("questionnaire")
 
 # =========================
 # Page 4: Workshop / Follow-on (STORY PITCH)
 # =========================
 elif st.session_state.page == "follow_on":
+    st.components.v1.html("<script>window.scrollTo(0, 0);</script>", height=0)
+    
     st.title("Workshop Results & Next Steps")
     st.markdown("Like a newsroom, a **second set of eyes** can reveal new angles and blind spots. Use the tools below to review your session.")
     st.markdown("---")
@@ -786,13 +979,20 @@ elif st.session_state.page == "follow_on":
     """)
     st.markdown('</div>', unsafe_allow_html=True)
 
+    # Feedback button at end
+    st.markdown("---")
+    col_fb1, col_fb2, col_fb3 = st.columns([1, 2, 1])
+    with col_fb2:
+        st.link_button("💬 Tell Us What You Think", 
+                       url="https://forms.gle/YOUR_FORM_ID", 
+                       use_container_width=True,
+                       type="secondary")
+
+    st.markdown("---")
     colb1, colb2 = st.columns([1,1])
     with colb1:
         if st.button("← Start Another Pitch", use_container_width=True):
-            go_to_page("questionnaire"); st.rerun()
+            go_to_page("questionnaire")
     with colb2:
         if st.button("← Back to Portal", use_container_width=True):
-            go_to_page("portal"); st.rerun()
-
-# END OF v19.3 - All pages complete
-# To use: Concatenate Part 1 and Part 2 (remove the "# v19.3 - PART 2 OF 2" header from Part 2)
+            go_to_page("portal")

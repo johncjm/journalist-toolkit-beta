@@ -366,7 +366,6 @@ elif st.session_state.page == "reporting_plan_questionnaire":
 elif st.session_state.page == "reporting_plan_recipe":
     st.components.v1.html("""<script>window.scrollTo(0,0);</script>""", height=0)
 
-
     path = st.session_state.get("reporting_path")
     if not path:
         st.warning("⚠️ No reporting path selected. Please go back and choose a path.", icon="⚠️")
@@ -553,9 +552,9 @@ elif st.session_state.page == "reporting_plan_recipe":
 
 4. **CONSTRAINTS** — Guardrails that keep the AI on track: *coach, don’t do*; be Socratic; avoid naming specific people/institutions; push for verification when claims are made.
 
-5. **ETHICAL LENS** — Prompts the AI to consider bias, harm, privacy, and diverse sourcing, and to nudge you to plan for fairness and accountability.
+5. **ETHICAL LENS** — Consider bias, harm, privacy, diverse sourcing; plan mitigation before publishing.
 
-6. **FINAL GOAL REMINDER** — Re-centers the session on the outcome: you leave with a clear, actionable checklist that **you** built (not prose written for you).
+6. **FINAL GOAL REMINDER** — You leave with a clear, actionable checklist that **you** built (not prose written for you).
                 """
             )
 

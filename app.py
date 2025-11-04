@@ -1,14 +1,11 @@
-# v21.5 — Adds Prepare-for-Interview (jt_tools) + stable routing
-
-# - Portal hero tightened, "Get Started" row with inline Experience selector
-# - Streamlit 1.50 CSS compat shim + inline hero styles
-# - Cards use st.container(border=True) (robust, no custom wrappers)
-# - Full prompt recipes for Event, Explore, Confirm
-# - Restored full "Anatomy of the Prompt" section
-# - Workshop page for second-opinion/reviewer prompt
-# - Safe copy-to-clipboard (html.escape + uuid)
-# - New: Prepare-for-Interview page via jt_tools (import + routing)
-
+# v21.5-stable — Crew release (+Prepare-for-Interview hook, indentation + scrollTo fixes)
+# - Portal hero + Get Started row with inline Experience selector
+# - Streamlit 1.50 CSS compat shim (safe selectors only)
+# - Event / Explore / Confirm flows (questionnaire + recipe pages)
+# - Story Pitch flow (questionnaire + recipe pages)
+# - Workshop follow-on page
+# - Copy-to-clipboard helper (html.escape + uuid)
+# - Prepare-for-Interview module routed via jt_tools if available
 
 import streamlit as st
 import textwrap
@@ -23,33 +20,22 @@ except Exception as _e:
     _HAS_PREP = False
     _PREP_IMPORT_ERR = _e
 
-
 # ---------- APP CONFIG ----------
 st.set_page_config(page_title="Journalist's Toolkit", layout="wide")
-st.caption(f"🛠️ Journalist’s Toolkit • v21.5 • Streamlit {st.__version__}")
+st.caption(f"🛠️ Journalist’s Toolkit • v21.5-stable • Streamlit {st.__version__}")
 
 # ---------- LIGHT COMPAT CSS SHIM (safe selectors only) ----------
 st.markdown(
     """
 <style>
 /* App background container (stable selector) */
-[data-testid="stAppViewContainer"] {
-  background: #f8fafc !important;
-}
-
+[data-testid="stAppViewContainer"] { background: #f8fafc !important; }
 /* Remove header white strip */
-header[data-testid="stHeader"] {
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
+header[data-testid="stHeader"] { background: transparent !important; box-shadow: none !important; }
 /* Top padding across builds */
 section.main > div.block-container,
 [data-testid="stAppViewContainer"] .main .block-container,
-[data-testid="stAppViewContainer"] [data-testid="block-container"] {
-  padding-top: 1.0rem !important;
-}
-
+[data-testid="stAppViewContainer"] [data-testid="block-container"] { padding-top: 1.0rem !important; }
 /* Minor typography smoothing */
 h1,h2,h3 { letter-spacing: -0.01em; }
 </style>
@@ -73,6 +59,7 @@ def copy_button_js(text_to_copy: str, button_text: str = "Copy to Clipboard"):
         <textarea id="{text_area_id}" style="opacity:0;position:absolute;height:0;width:0;">{safe}</textarea>
         <button id="{unique_id}" onclick="
             const text = document.getElementById('{text_area_id}').value;
+            if (!navigator.clipboard) {{ return; }}
             navigator.clipboard.writeText(text).then(() => {{
                 const btn = document.getElementById('{unique_id}');
                 const original = btn.innerText;
@@ -101,7 +88,7 @@ if "journalism_level" not in st.session_state:
 if st.session_state.page == "portal":
     # Hero (inline styles = robust to DOM changes)
     st.markdown(
-        '''
+        """
 <div style="
   background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
   color: white; border-radius: 16px;
@@ -109,15 +96,15 @@ if st.session_state.page == "portal":
   <h1 style="margin:0 0 .5rem 0; font-weight:800;">Journalist’s Toolkit</h1>
   <p style="margin:0; opacity:.95;">AI-powered coaching tools that stand in for an editor, help you think like a journalist, and strengthen your work.</p>
 </div>
-''',
+""",
         unsafe_allow_html=True,
     )
 
     # Get Started row with inline experience selector
-    c1, c2 = st.columns([1.2, 2.8])
-    with c1:
+    col1, col2 = st.columns([1.2, 2.8])
+    with col1:
         st.markdown("### Get Started")
-    with c2:
+    with col2:
         st.session_state.journalism_level = st.selectbox(
             "Your experience level:",
             ["High School journalist", "Undergraduate journalist", "Grad school journalist", "Working journalist"],
@@ -158,15 +145,12 @@ if st.session_state.page == "portal":
     with left:
         if st.button("Prepare a Story Pitch", type="primary", use_container_width=True):
             go_to("questionnaire")
-        # NEW: Prepare-for-Interview entry point
-        if st.button(
-            "Prepare for an Interview",
-            type="secondary",
-            use_container_width=True,
-            help="Build a coaching recipe + Practice Brief for a specific source",
-        ):
-            go_to("prepare_interview")
-        st.button("Develop Interview Questions", use_container_width=True, disabled=True, help="Coming soon")
+        if st.button("Prepare for an Interview", use_container_width=True):
+            if _HAS_PREP:
+                go_to("prep")
+            else:
+                st.error("Prepare-for-Interview module not available.\n\n"
+                         f"{_PREP_IMPORT_ERR if '_PREP_IMPORT_ERR' in globals() else ''}")
         st.button("Vet a Source", use_container_width=True, disabled=True, help="Coming soon")
     with right:
         if st.button("Get Ready to Report", type="primary", use_container_width=True):
@@ -184,21 +168,14 @@ if st.session_state.page == "portal":
         st.link_button("Try Team of Rivals →", "https://team-of-rivals-tor1-beta.streamlit.app/", use_container_width=False)
 
 # =========================================================
-# PAGE: Prepare for an Interview (NEW)
+# PAGE: Prepare-for-Interview (jt_tools)
 # =========================================================
-elif st.session_state.page == "prepare_interview":
-    st.components.v1.html("<script>window.scrollTo(0,0);</script>", height=0)
-    st.title("Prepare for an Interview 🧭")
-
+elif st.session_state.page == "prep":
+    st.components.v1.html("""<script>window.scrollTo(0,0);</script>""", height=0)
     if _HAS_PREP:
-        # Delegate to the module UI
         render_prepare_interview_prep()
     else:
-        st.error("Couldn't load the Prepare-for-an-Interview tool.")
-        with st.expander("Show technical details"):
-            st.exception(_PREP_IMPORT_ERR)
-
-    st.markdown("---")
+        st.error("Prepare-for-Interview module failed to load.")
     if st.button("← Back to Portal"):
         go_to("portal")
 
@@ -212,15 +189,18 @@ elif st.session_state.page == "grr_choice":
     c1, c2, c3 = st.columns(3)
     with c1:
         if st.button("Event", use_container_width=True):
-            st.session_state.reporting_path = "event"; go_to("reporting_plan_questionnaire")
+            st.session_state.reporting_path = "event"
+            go_to("reporting_plan_questionnaire")
         st.caption("Something scheduled is worth covering (vote, protest, presser).")
     with c2:
         if st.button("Explore", use_container_width=True):
-            st.session_state.reporting_path = "explore"; go_to("reporting_plan_questionnaire")
+            st.session_state.reporting_path = "explore"
+            go_to("reporting_plan_questionnaire")
         st.caption("There’s a territory or community you want to understand.")
     with c3:
         if st.button("Confirm", use_container_width=True):
-            st.session_state.reporting_path = "confirm"; go_to("reporting_plan_questionnaire")
+            st.session_state.reporting_path = "confirm"
+            go_to("reporting_plan_questionnaire")
         st.caption("You’ve heard a claim/rumor and need to verify it.")
     st.markdown("---")
     if st.button("← Back to Portal"):
@@ -380,7 +360,6 @@ elif st.session_state.page == "reporting_plan_recipe":
     data = st.session_state.get("form_data", {})
     level = st.session_state.get("journalism_level", "N/A")
 
-    # Build prompt by path
     if path == "event":
         context_string = f"""
 - Headline/Tweet: {data.get('q1_headline','N/A')}
@@ -560,12 +539,12 @@ elif st.session_state.page == "reporting_plan_recipe":
 
     st.markdown("---")
     st.markdown("**💡 Tip:** These links are shortcuts—you can paste this into *any* AI chat tool.")
-    c1, c2, c3 = st.columns(3)
-    with c1:
+    g1, g2, g3 = st.columns(3)
+    with g1:
         st.link_button("Open Google Gemini", "https://gemini.google.com", use_container_width=True)
-    with c2:
+    with g2:
         st.link_button("Open Anthropic Claude", "https://claude.ai", use_container_width=True)
-    with c3:
+    with g3:
         st.link_button("Open OpenAI ChatGPT", "https://chat.openai.com", use_container_width=True)
 
     st.markdown("---")
@@ -575,11 +554,10 @@ elif st.session_state.page == "reporting_plan_recipe":
         go_to("reporting_plan_questionnaire")
 
 # =========================================================
-# PAGE: Story Pitch Questionnaire (unchanged flow, cleaned UI)
+# PAGE: Story Pitch Questionnaire
 # =========================================================
 elif st.session_state.page == "questionnaire":
     st.components.v1.html("""<script>window.scrollTo(0,0);</script>""", height=0)
-
     st.title("Story Pitch Coach")
     st.markdown("Answer what you can—this helps you think like an editor before you pitch.")
     with st.form("pitch_form"):
@@ -624,11 +602,10 @@ elif st.session_state.page == "questionnaire":
         go_to("portal")
 
 # =========================================================
-# PAGE: Pitch Recipe (unchanged logic, refreshed sidebar anatomy block)
+# PAGE: Pitch Recipe
 # =========================================================
 elif st.session_state.page == "recipe":
-   st.components.v1.html("""<script>window.scrollTo(0,0);</script>""", height=0)
-
+    st.components.v1.html("""<script>window.scrollTo(0,0);</script>""", height=0)
     st.title("Your Custom Prompt Recipe 📝")
     st.markdown("This prompt combines your pitch with expert coaching instructions.")
     st.markdown("---")
@@ -644,10 +621,13 @@ elif st.session_state.page == "recipe":
         f"- Target Audience: {data.get('target_audience', 'N/A')}",
         f"- Stage: {data.get('reporting_stage', 'N/A')}",
     ]
-    if data.get("working_headline"): context_lines.append(f'- Working Headline: "{data["working_headline"]}"')
-    if data.get("key_conflict"): context_lines.append(f"- Key Conflict: {data['key_conflict']}")
-    if data.get("sources"): context_lines.append(f"- Sources: {data['sources']}")
-    context_lines.append(f'- User Pitch: "{(data.get("pitch_text","\").strip())}"')
+    if data.get("working_headline"):
+        context_lines.append(f'- Working Headline: "{data["working_headline"]}"')
+    if data.get("key_conflict"):
+        context_lines.append(f"- Key Conflict: {data['key_conflict']}")
+    if data.get("sources"):
+        context_lines.append(f"- Sources: {data['sources']}")
+    context_lines.append(f'- User Pitch: "{(data.get("pitch_text","").strip())}"')
     full_context = "\n".join(context_lines)
 
     final_prompt = textwrap.dedent(f"""
@@ -671,7 +651,7 @@ elif st.session_state.page == "recipe":
     - The outcome is better judgment, not perfect prose.
     """)
 
-    cmain, cside = st.columns([2,1])
+    cmain, cside = st.columns([2, 1])
     with cmain:
         st.subheader("Your Assembled Prompt")
         st.text_area("Prompt Text", final_prompt, height=460, label_visibility="collapsed")
@@ -702,21 +682,25 @@ elif st.session_state.page == "recipe":
 
     st.markdown("---")
     st.markdown("**💡 Tip:** Paste this into any AI chat.")
-    a, b, c = st.columns(3)
-    with a: st.link_button("Open Google Gemini", "https://gemini.google.com", use_container_width=True)
-    with b: st.link_button("Open Anthropic Claude", "https://claude.ai", use_container_width=True)
-    with c: st.link_button("Open OpenAI ChatGPT", "https://chat.openai.com", use_container_width=True)
+    a1, a2, a3 = st.columns(3)
+    with a1:
+        st.link_button("Open Google Gemini", "https://gemini.google.com", use_container_width=True)
+    with a2:
+        st.link_button("Open Anthropic Claude", "https://claude.ai", use_container_width=True)
+    with a3:
+        st.link_button("Open OpenAI ChatGPT", "https://chat.openai.com", use_container_width=True)
 
     st.markdown("---")
-    if st.button("Continue to Workshop →", type="primary"): go_to("follow_on")
-    if st.button("← Back to Questionnaire"): go_to("questionnaire")
+    if st.button("Continue to Workshop →", type="primary"):
+        go_to("follow_on")
+    if st.button("← Back to Questionnaire"):
+        go_to("questionnaire")
 
 # =========================================================
 # PAGE: Workshop / Follow-on
 # =========================================================
 elif st.session_state.page == "follow_on":
     st.components.v1.html("""<script>window.scrollTo(0,0);</script>""", height=0)
-
     st.title("Workshop Results & Next Steps")
     st.markdown("Paste highlights from your coaching session for a **second opinion** or to plan next steps.")
     st.markdown("---")
@@ -768,6 +752,8 @@ elif st.session_state.page == "follow_on":
     st.markdown("---")
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("← Start Another Pitch", use_container_width=True): go_to("questionnaire")
+        if st.button("← Start Another Pitch", use_container_width=True):
+            go_to("questionnaire")
     with col2:
-        if st.button("← Back to Portal", use_container_width=True): go_to("portal")
+        if st.button("← Back to Portal", use_container_width=True):
+            go_to("portal")

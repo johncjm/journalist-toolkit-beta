@@ -1,4 +1,5 @@
-# v21.4-stable — Crew release
+# v21.5 — Adds Prepare-for-Interview (jt_tools) + stable routing
+
 # - Portal hero tightened, "Get Started" row with inline Experience selector
 # - Streamlit 1.50 CSS compat shim + inline hero styles
 # - Cards use st.container(border=True) (robust, no custom wrappers)
@@ -6,15 +7,26 @@
 # - Restored full "Anatomy of the Prompt" section
 # - Workshop page for second-opinion/reviewer prompt
 # - Safe copy-to-clipboard (html.escape + uuid)
+# - New: Prepare-for-Interview page via jt_tools (import + routing)
+
 
 import streamlit as st
 import textwrap
 import html
 import uuid
 
+# --- Prepare-for-an-Interview tool (jt_tools) ---
+try:
+    from jt_tools.prepare_interview_prep import render_prepare_interview_prep
+    _HAS_PREP = True
+except Exception as _e:
+    _HAS_PREP = False
+    _PREP_IMPORT_ERR = _e
+
+
 # ---------- APP CONFIG ----------
 st.set_page_config(page_title="Journalist's Toolkit", layout="wide")
-st.caption(f"🛠️ Journalist’s Toolkit • v21.2-stable • Streamlit {st.__version__}")
+st.caption(f"🛠️ Journalist’s Toolkit • v21.5 • Streamlit {st.__version__}")
 
 # ---------- LIGHT COMPAT CSS SHIM (safe selectors only) ----------
 st.markdown(
@@ -146,6 +158,14 @@ if st.session_state.page == "portal":
     with left:
         if st.button("Prepare a Story Pitch", type="primary", use_container_width=True):
             go_to("questionnaire")
+        # NEW: Prepare-for-Interview entry point
+        if st.button(
+            "Prepare for an Interview",
+            type="secondary",
+            use_container_width=True,
+            help="Build a coaching recipe + Practice Brief for a specific source",
+        ):
+            go_to("prepare_interview")
         st.button("Develop Interview Questions", use_container_width=True, disabled=True, help="Coming soon")
         st.button("Vet a Source", use_container_width=True, disabled=True, help="Coming soon")
     with right:
@@ -162,6 +182,25 @@ if st.session_state.page == "portal":
             "Team of Rivals brings ChatGPT, Claude, and Gemini together for multi-round discussions."
         )
         st.link_button("Try Team of Rivals →", "https://team-of-rivals-tor1-beta.streamlit.app/", use_container_width=False)
+
+# =========================================================
+# PAGE: Prepare for an Interview (NEW)
+# =========================================================
+elif st.session_state.page == "prepare_interview":
+    st.components.v1.html("<script>window.scrollTo(0,0);</script>", height=0)
+    st.title("Prepare for an Interview 🧭")
+
+    if _HAS_PREP:
+        # Delegate to the module UI
+        render_prepare_interview_prep()
+    else:
+        st.error("Couldn't load the Prepare-for-an-Interview tool.")
+        with st.expander("Show technical details"):
+            st.exception(_PREP_IMPORT_ERR)
+
+    st.markdown("---")
+    if st.button("← Back to Portal"):
+        go_to("portal")
 
 # =========================================================
 # PAGE: Get Ready to Report — Choice
@@ -325,7 +364,7 @@ elif st.session_state.page == "reporting_plan_questionnaire":
 # PAGE: GRR Recipe (Event / Explore / Confirm)
 # =========================================================
 elif st.session_state.page == "reporting_plan_recipe":
-    st.components.v1.html("<script>window.scrollTo(0,0);</script>", height=0)
+    st.components.v1.html("<script>window.scrollTo(0,0);"></script>", height=0)
 
     path = st.session_state.get("reporting_path")
     if not path:
@@ -539,7 +578,7 @@ elif st.session_state.page == "reporting_plan_recipe":
 # PAGE: Story Pitch Questionnaire (unchanged flow, cleaned UI)
 # =========================================================
 elif st.session_state.page == "questionnaire":
-    st.components.v1.html("<script>window.scrollTo(0,0);</script>", height=0)
+    st.components.v1.html("<script>window.scrollTo(0,0);"></script>", height=0)
     st.title("Story Pitch Coach")
     st.markdown("Answer what you can—this helps you think like an editor before you pitch.")
     with st.form("pitch_form"):
@@ -587,7 +626,7 @@ elif st.session_state.page == "questionnaire":
 # PAGE: Pitch Recipe (unchanged logic, refreshed sidebar anatomy block)
 # =========================================================
 elif st.session_state.page == "recipe":
-    st.components.v1.html("<script>window.scrollTo(0,0);</script>", height=0)
+    st.components.v1.html("<script>window.scrollTo(0,0);"></script>", height=0)
     st.title("Your Custom Prompt Recipe 📝")
     st.markdown("This prompt combines your pitch with expert coaching instructions.")
     st.markdown("---")
@@ -606,7 +645,7 @@ elif st.session_state.page == "recipe":
     if data.get("working_headline"): context_lines.append(f'- Working Headline: "{data["working_headline"]}"')
     if data.get("key_conflict"): context_lines.append(f"- Key Conflict: {data['key_conflict']}")
     if data.get("sources"): context_lines.append(f"- Sources: {data['sources']}")
-    context_lines.append(f'- User Pitch: "{(data.get("pitch_text","").strip())}"')
+    context_lines.append(f'- User Pitch: "{(data.get("pitch_text","\").strip())}"')
     full_context = "\n".join(context_lines)
 
     final_prompt = textwrap.dedent(f"""
@@ -674,7 +713,7 @@ elif st.session_state.page == "recipe":
 # PAGE: Workshop / Follow-on
 # =========================================================
 elif st.session_state.page == "follow_on":
-    st.components.v1.html("<script>window.scrollTo(0,0);</script>", height=0)
+    st.components.v1.html("<script>window.scrollTo(0,0);"></script>", height=0)
     st.title("Workshop Results & Next Steps")
     st.markdown("Paste highlights from your coaching session for a **second opinion** or to plan next steps.")
     st.markdown("---")

@@ -364,7 +364,8 @@ elif st.session_state.page == "reporting_plan_questionnaire":
 # PAGE: GRR Recipe (Event / Explore / Confirm)
 # =========================================================
 elif st.session_state.page == "reporting_plan_recipe":
-    st.components.v1.html("<script>window.scrollTo(0,0);"></script>", height=0)
+    st.components.v1.html("""<script>window.scrollTo(0,0);</script>""", height=0)
+
 
     path = st.session_state.get("reporting_path")
     if not path:
@@ -578,7 +579,8 @@ elif st.session_state.page == "reporting_plan_recipe":
 # PAGE: Story Pitch Questionnaire (unchanged flow, cleaned UI)
 # =========================================================
 elif st.session_state.page == "questionnaire":
-    st.components.v1.html("<script>window.scrollTo(0,0);"></script>", height=0)
+    st.components.v1.html("""<script>window.scrollTo(0,0);</script>""", height=0)
+
     st.title("Story Pitch Coach")
     st.markdown("Answer what you can—this helps you think like an editor before you pitch.")
     with st.form("pitch_form"):
@@ -626,7 +628,8 @@ elif st.session_state.page == "questionnaire":
 # PAGE: Pitch Recipe (unchanged logic, refreshed sidebar anatomy block)
 # =========================================================
 elif st.session_state.page == "recipe":
-    st.components.v1.html("<script>window.scrollTo(0,0);"></script>", height=0)
+   st.components.v1.html("""<script>window.scrollTo(0,0);</script>""", height=0)
+
     st.title("Your Custom Prompt Recipe 📝")
     st.markdown("This prompt combines your pitch with expert coaching instructions.")
     st.markdown("---")
@@ -713,7 +716,8 @@ elif st.session_state.page == "recipe":
 # PAGE: Workshop / Follow-on
 # =========================================================
 elif st.session_state.page == "follow_on":
-    st.components.v1.html("<script>window.scrollTo(0,0);"></script>", height=0)
+    st.components.v1.html("""<script>window.scrollTo(0,0);</script>""", height=0)
+
     st.title("Workshop Results & Next Steps")
     st.markdown("Paste highlights from your coaching session for a **second opinion** or to plan next steps.")
     st.markdown("---")

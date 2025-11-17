@@ -1,5 +1,9 @@
-# v21.5-stable — Crew release (+Prepare-for-Interview hook, indentation + scrollTo fixes)
-# - Portal hero + Get Started row with inline Experience selector
+# v22.1-streamlined — Portal refresh + experience selector moved to questionnaires
+# - Clean, student-focused portal copy
+# - Experience level selector removed from portal
+# - Experience level selector added to top of each questionnaire (Story Pitch, GRR)
+# - Fixed: Experience selector added to GRR choice page
+# - Fixed: Prepare for Interview button is now primary (red)
 # - Streamlit 1.50 CSS compat shim (safe selectors only)
 # - Event / Explore / Confirm flows (questionnaire + recipe pages)
 # - Story Pitch flow (questionnaire + recipe pages)
@@ -22,7 +26,7 @@ except Exception as _e:
 
 # ---------- APP CONFIG ----------
 st.set_page_config(page_title="Journalist's Toolkit", layout="wide")
-st.caption(f"🛠️ Journalist’s Toolkit • v21.5-stable • Streamlit {st.__version__}")
+st.caption(f"🛠️ Journalist's Toolkit • v22.1-streamlined • Streamlit {st.__version__}")
 
 # ---------- LIGHT COMPAT CSS SHIM (safe selectors only) ----------
 st.markdown(
@@ -80,92 +84,86 @@ def get_counter(text: str):
 if "page" not in st.session_state:
     st.session_state.page = "portal"
 if "journalism_level" not in st.session_state:
-    st.session_state.journalism_level = "Undergraduate journalist"
+    st.session_state.journalism_level = "High School journalist"
 
 # =========================================================
 # PAGE: PORTAL
 # =========================================================
 if st.session_state.page == "portal":
-    # Hero (inline styles = robust to DOM changes)
+    # Hero
     st.markdown(
         """
 <div style="
   background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
   color: white; border-radius: 16px;
-  padding: 1.25rem 1.5rem 1rem 1.5rem; margin-bottom: 0.5rem;">
-  <h1 style="margin:0 0 .5rem 0; font-weight:800;">Journalist’s Toolkit</h1>
-  <p style="margin:0; opacity:.95;">AI-powered coaching tools that stand in for an editor, help you think like a journalist, and strengthen your work.</p>
+  padding: 1.25rem 1.5rem 1rem 1.5rem; margin-bottom: 1rem;">
+  <h1 style="margin:0 0 .5rem 0; font-weight:800;">Journalist's Toolkit</h1>
+  <p style="margin:0; opacity:.95;">A journalism tool that won't do your writing for you but will build your skills the way a great editor does—powered by AI, guided by real newsroom experience.</p>
 </div>
 """,
         unsafe_allow_html=True,
     )
 
-    # Get Started row with inline experience selector
-    col1, col2 = st.columns([1.2, 2.8])
-    with col1:
-        st.markdown("### Get Started")
-    with col2:
-        st.session_state.journalism_level = st.selectbox(
-            "Your experience level:",
-            ["High School journalist", "Undergraduate journalist", "Grad school journalist", "Working journalist"],
-            index=["High School journalist", "Undergraduate journalist", "Grad school journalist", "Working journalist"]
-            .index(st.session_state.journalism_level),
-            label_visibility="visible",
-        )
+    # Dek
+    st.markdown(
+        """
+If you're a student, a freelancer, or a young journalist working without a strong safety net, 
+Journalist's Toolkit can provide the structure, coaching and feedback the pros rely on.
+"""
+    )
+
+    st.markdown("---")
 
     # How It Works
-    with st.container(border=True):
-        st.markdown("### How It Works")
-        st.markdown(
-            "Journalism requires many skills. This app uses AI as a **coach**, not a shortcut—"
-            "guiding you with the kinds of questions a good editor would ask."
-        )
-        a, b = st.columns(2)
-        with a:
-            st.markdown("**1. Pick a Task**  \nPitch, reporting prep, etc.")
-        with b:
-            st.markdown("**2. Answer Questions**  \nThink through an editor’s checklist.")
-        c, d = st.columns(2)
-        with c:
-            st.markdown("**3. Get Your Prompt**  \nWe assemble expert coaching instructions.")
-        with d:
-            st.markdown("**4. Start Coaching**  \nPaste the prompt into your preferred AI.")
+    st.markdown("### How It Works")
+    st.markdown(
+        """
+**Answer questions** that replicate the grilling you'd get from a newsdesk editor.
 
-    # Caveat / philosophy
-    with st.container(border=True):
-        st.markdown("### Copy and Paste, Huh?")
-        st.markdown(
-            "**Yes.** Prompts here are meant to be pasted into any AI you prefer. "
-            "This keeps the tool **free**, lets you **choose** the model, and often performs **better** than an API hookup."
-        )
+**Have a coaching session** with an AI that's been given a custom prompt—so it knows what you need, 
+where you're at on a story, and understands newsroom realities.
+"""
+    )
 
-    # Task buttons
-    st.markdown("#### Now, choose a task:")
+    st.markdown("---")
+
+    # Start Here
+    st.markdown("### Start Here: Pre-Reporting Tools")
+    st.markdown("These tools help you prepare BEFORE you start your reporting.")
+
+    st.markdown("")  # spacing
+
     left, right = st.columns(2)
     with left:
         if st.button("Prepare a Story Pitch", type="primary", use_container_width=True):
             go_to("questionnaire")
-        if st.button("Prepare for an Interview", use_container_width=True):
+        st.caption("Stress-test your ideas.")
+        
+        st.markdown("")  # spacing
+        
+        if st.button("Prepare for an Interview", type="primary", use_container_width=True):
             if _HAS_PREP:
                 go_to("prep")
             else:
                 st.error("Prepare-for-Interview module not available.\n\n"
                          f"{_PREP_IMPORT_ERR if '_PREP_IMPORT_ERR' in globals() else ''}")
-        st.button("Vet a Source", use_container_width=True, disabled=True, help="Coming soon")
+        st.caption("Combine research and a practice session.")
+
     with right:
         if st.button("Get Ready to Report", type="primary", use_container_width=True):
             go_to("grr_choice")
-        st.button("Structure a First Draft", use_container_width=True, disabled=True, help="Coming soon")
-        st.button("Check Your Facts", use_container_width=True, disabled=True, help="Coming soon")
+        st.caption("Figure out what you need to know and how to get started.")
 
-    # Footer CTA
-    with st.container(border=True):
-        st.info(
-            "💡 **Looking for a different kind of collaboration?** "
-            "Test whether three AI models working together produce better results than one. "
-            "Team of Rivals brings ChatGPT, Claude, and Gemini together for multi-round discussions."
-        )
-        st.link_button("Try Team of Rivals →", "https://team-of-rivals-tor1-beta.streamlit.app/", use_container_width=False)
+    st.markdown("---")
+
+    # Footer - In the Works
+    st.markdown("### In the Works: Your Newsroom Coach A-Z")
+    st.markdown(
+        """
+JT is being built as a complete suite covering the entire reporting and writing process. 
+Currently available: pre-reporting prep. In development: source vetting, draft structure, fact-checking.
+"""
+    )
 
 # =========================================================
 # PAGE: Prepare-for-Interview (jt_tools)
@@ -184,6 +182,19 @@ elif st.session_state.page == "prep":
 # =========================================================
 elif st.session_state.page == "grr_choice":
     st.title("Get Ready to Report 📋")
+    
+    # Experience level selector at top
+    level = st.radio(
+        "Your experience level (affects coaching tone):",
+        ["High School journalist", "Undergraduate journalist", "Grad school journalist", "Working journalist"],
+        index=["High School journalist", "Undergraduate journalist", "Grad school journalist", "Working journalist"]
+            .index(st.session_state.journalism_level),
+        horizontal=True,
+        key="level_selector_grr_choice"
+    )
+    st.session_state.journalism_level = level
+    st.markdown("---")
+    
     st.markdown("Different kinds of stories call for different prep. Which best describes your situation?")
     st.markdown("---")
     c1, c2, c3 = st.columns(3)
@@ -196,12 +207,12 @@ elif st.session_state.page == "grr_choice":
         if st.button("Explore", use_container_width=True):
             st.session_state.reporting_path = "explore"
             go_to("reporting_plan_questionnaire")
-        st.caption("There’s a territory or community you want to understand.")
+        st.caption("There's a territory or community you want to understand.")
     with c3:
         if st.button("Confirm", use_container_width=True):
             st.session_state.reporting_path = "confirm"
             go_to("reporting_plan_questionnaire")
-        st.caption("You’ve heard a claim/rumor and need to verify it.")
+        st.caption("You've heard a claim/rumor and need to verify it.")
     st.markdown("---")
     if st.button("← Back to Portal"):
         go_to("portal")
@@ -210,15 +221,21 @@ elif st.session_state.page == "grr_choice":
 # PAGE: GRR Questionnaire
 # =========================================================
 elif st.session_state.page == "reporting_plan_questionnaire":
+    st.components.v1.html("""<script>window.scrollTo(0,0);</script>""", height=0)
+    
     path = st.session_state.get("reporting_path", "event")
     st.title(f"Reporting Plan: {path.capitalize()} Path")
 
+    # Note: Experience level already set on grr_choice page, but show current selection
+    st.caption(f"Experience level: {st.session_state.journalism_level}")
+    st.markdown("---")
+
     if path == "event":
-        st.markdown("Let’s prep you for the event. Answer what you can; blanks are okay.")
+        st.markdown("Let's prep you for the event. Answer what you can; blanks are okay.")
         with st.form("event_plan_form"):
             with st.container(border=True):
                 st.markdown("### Part 1: The Situation")
-                q1_headline = st.text_input("What’s happening — a headline/tweet-length summary?")
+                q1_headline = st.text_input("What's happening — a headline/tweet-length summary?")
                 q2_where_when = st.text_input("Where and when is it happening?")
                 q3_key_people = st.text_input("Who are the key people involved?")
                 q4_why_now = st.text_input("Why is it happening now?")
@@ -226,14 +243,14 @@ elif st.session_state.page == "reporting_plan_questionnaire":
                 st.markdown("### Part 2: The Stakes")
                 q5_how_big = st.text_input("How big a story is this?")
                 q6_important = st.text_input("What makes it important?")
-                q7_audience = st.text_input("Who’s the key audience?")
+                q7_audience = st.text_input("Who's the key audience?")
                 st.markdown("---")
                 st.markdown("### Part 3: Getting Started")
                 q8_work_done = st.text_area("What prep have you done so far?")
-                q9_prior_coverage = st.text_area("What’s already been covered? (links welcome)")
+                q9_prior_coverage = st.text_area("What's already been covered? (links welcome)")
                 q10_prior_coverage_effect = st.text_area("How does that affect your goals?")
-                q11_work_left = st.text_area("What’s the key work left (docs/people)?")
-                q12_anxious_excited = st.text_area("Anything you’re excited/anxious about?")
+                q11_work_left = st.text_area("What's the key work left (docs/people)?")
+                q12_anxious_excited = st.text_area("Anything you're excited/anxious about?")
                 st.markdown("---")
                 event_style = st.radio(
                     "AI editor style?",
@@ -266,13 +283,13 @@ elif st.session_state.page == "reporting_plan_questionnaire":
             with st.container(border=True):
                 st.markdown("### Part 1: Territory & Angle")
                 q1_territory = st.text_input("What do you want to explore (who/what/where)?")
-                q2_hunch = st.text_input("What’s your hunch or guiding question?")
+                q2_hunch = st.text_input("What's your hunch or guiding question?")
                 q3_curiosity = st.text_input("Why this now — what makes you curious?")
-                q4_audience = st.text_input("Who’s the audience and why would they care?")
+                q4_audience = st.text_input("Who's the audience and why would they care?")
                 st.markdown("---")
                 st.markdown("### Part 2: Starting Point")
                 q5_know = st.text_area("What do you already know?")
-                q6_dont_know = st.text_area("What’s the most important thing you don’t know?")
+                q6_dont_know = st.text_area("What's the most important thing you don't know?")
                 q7_prior_coverage = st.text_area("What has been covered already?")
                 q8_relationship_bias = st.text_area("Your relationship to this subject; assumptions/biases?")
                 st.markdown("---")
@@ -304,7 +321,7 @@ elif st.session_state.page == "reporting_plan_questionnaire":
                 go_to("reporting_plan_recipe")
 
     elif path == "confirm":
-        st.markdown("State the claim, the source, the stakes—and how you’ll verify.")
+        st.markdown("State the claim, the source, the stakes—and how you'll verify.")
         with st.form("confirm_plan_form"):
             with st.container(border=True):
                 q1_claim = st.text_area("**The Claim:** State a single, testable sentence.")
@@ -397,8 +414,8 @@ elif st.session_state.page == "reporting_plan_recipe":
         Ask about: Story angles → Logistics → Sourcing → Contingencies. Keep it question-led.
 
         # 4. CORE CONSTRAINTS
-        - Journalistic skepticism: ask how they’ll independently verify claims.  
-        - Coach, don’t do: **no lists or writing for them**; **don’t name people/institutions**.  
+        - Journalistic skepticism: ask how they'll independently verify claims.  
+        - Coach, don't do: **no lists or writing for them**; **don't name people/institutions**.  
         - Be Socratic; respect user choices.
 
         # 5. ETHICAL & DIVERSITY LENS
@@ -445,7 +462,7 @@ elif st.session_state.page == "reporting_plan_recipe":
         **Choice point**  
         Summarize themes and offer:  
         A) Focus a specific angle → build a concrete plan.  
-        B) Do more “fishing” → design an open-ended plan.  
+        B) Do more "fishing" → design an open-ended plan.  
         C) Reconsider the topic.
 
         **Post-choice**  
@@ -455,10 +472,10 @@ elif st.session_state.page == "reporting_plan_recipe":
 
         # 4. CORE CONSTRAINTS
         - Gentle skepticism; ask how to **test** assumptions.  
-        - **Don’t suggest specific angles or name people/institutions** during exploration.
+        - **Don't suggest specific angles or name people/institutions** during exploration.
 
         # 5. ETHICAL & DIVERSITY LENS
-        If they’re an outsider to the community, ask how they’ll ensure fair, accurate representation.
+        If they're an outsider to the community, ask how they'll ensure fair, accurate representation.
 
         # 6. FINAL GOAL
         Either a concrete plan, a plan for more exploration, or the decision to move on—all valid outcomes.
@@ -523,13 +540,13 @@ elif st.session_state.page == "reporting_plan_recipe":
             st.markdown("---")
             st.markdown(
                 """
-1. **ROLE & GOAL** — Who the AI should be (e.g., an experienced editor) and what it’s trying to accomplish (coach you by asking questions, not doing the work).
+1. **ROLE & GOAL** — Who the AI should be (e.g., an experienced editor) and what it's trying to accomplish (coach you by asking questions, not doing the work).
 
 2. **CONTEXT** — Your answers from the questionnaire. This gives the AI concrete facts so its questions are specific and relevant.
 
 3. **FLOW** — The conversation game plan: how to open (acknowledge + find gaps), where to probe (angles, logistics, sourcing, risks), and when to offer a choice about next steps.
 
-4. **CONSTRAINTS** — Guardrails that keep the AI on track: *coach, don’t do*; be Socratic; avoid naming specific people/institutions; push for verification when claims are made.
+4. **CONSTRAINTS** — Guardrails that keep the AI on track: *coach, don't do*; be Socratic; avoid naming specific people/institutions; push for verification when claims are made.
 
 5. **ETHICAL LENS** — Consider bias, harm, privacy, diverse sourcing; plan mitigation before publishing.
 
@@ -559,6 +576,19 @@ elif st.session_state.page == "reporting_plan_recipe":
 elif st.session_state.page == "questionnaire":
     st.components.v1.html("""<script>window.scrollTo(0,0);</script>""", height=0)
     st.title("Story Pitch Coach")
+
+    # Experience level selector at top
+    level = st.radio(
+        "Your experience level (affects coaching tone):",
+        ["High School journalist", "Undergraduate journalist", "Grad school journalist", "Working journalist"],
+        index=["High School journalist", "Undergraduate journalist", "Grad school journalist", "Working journalist"]
+            .index(st.session_state.journalism_level),
+        horizontal=True,
+        key="level_selector_pitch"
+    )
+    st.session_state.journalism_level = level
+    st.markdown("---")
+
     st.markdown("Answer what you can—this helps you think like an editor before you pitch.")
     with st.form("pitch_form"):
         with st.container(border=True):
@@ -646,7 +676,7 @@ elif st.session_state.page == "recipe":
     - **Turn 4+:** Offer a choice → A) move to reporting plan; B) rethink angle; C) consider a different story.
 
     # 5. CORE CONSTRAINTS
-    - **Guide, don’t write.** Do not name specific people/institutions.
+    - **Guide, don't write.** Do not name specific people/institutions.
     - Probe verification for any political/data claims.
     - The outcome is better judgment, not perfect prose.
     """)
@@ -666,13 +696,13 @@ elif st.session_state.page == "recipe":
             st.markdown("---")
             st.markdown(
                 """
-1. **ROLE & GOAL** — Who the AI should be and what it’s trying to achieve.
+1. **ROLE & GOAL** — Who the AI should be and what it's trying to achieve.
 
 2. **CONTEXT** — Your answers/pitch so questions are specific and relevant.
 
 3. **FLOW** — Plan for opening, probing, and choice of next steps.
 
-4. **CONSTRAINTS** — Guardrails: *coach, don’t do*; be Socratic; avoid naming people/institutions; require verification.
+4. **CONSTRAINTS** — Guardrails: *coach, don't do*; be Socratic; avoid naming people/institutions; require verification.
 
 5. **ETHICAL LENS** — Consider bias, harm, privacy, diverse sourcing.
 
@@ -711,9 +741,9 @@ elif st.session_state.page == "follow_on":
         if st.button("Generate 'New Perspective' Prompt"):
             follow_up = textwrap.dedent(f"""
             You are continuing a coaching session on a story/pitch. Adopt the **{new_persona}** lens for this reply only.
-            - Briefly restate the pitch’s reader promise (1 sentence).
+            - Briefly restate the pitch's reader promise (1 sentence).
             - Ask **two** pointed questions from this lens that would most improve the work.
-            - Offer **one** risk you’d want verified before publication.
+            - Offer **one** risk you'd want verified before publication.
             End under 150 words. Do **not** rewrite the pitch.
             """)
             st.code(follow_up, language="markdown")

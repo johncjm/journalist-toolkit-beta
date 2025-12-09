@@ -1,15 +1,8 @@
-# v22.1-streamlined — Portal refresh + experience selector moved to questionnaires
-# - Clean, student-focused portal copy
-# - Experience level selector removed from portal
-# - Experience level selector added to top of each questionnaire (Story Pitch, GRR)
-# - Fixed: Experience selector added to GRR choice page
-# - Fixed: Prepare for Interview button is now primary (red)
-# - Streamlit 1.50 CSS compat shim (safe selectors only)
-# - Event / Explore / Confirm flows (questionnaire + recipe pages)
-# - Story Pitch flow (questionnaire + recipe pages)
-# - Workshop follow-on page
-# - Copy-to-clipboard helper (html.escape + uuid)
-# - Prepare-for-Interview module routed via jt_tools if available
+# v22.2 — Simplified portal for high school demo
+# - Streamlined hero + dek (no "How It Works" section)
+# - Conversational "What do you need help with?" framing
+# - "In the Works" as subtle italic footer
+# - All other pages unchanged from v22.1
 
 import streamlit as st
 import textwrap
@@ -26,7 +19,7 @@ except Exception as _e:
 
 # ---------- APP CONFIG ----------
 st.set_page_config(page_title="Journalist's Toolkit", layout="wide")
-st.caption(f"🛠️ Journalist's Toolkit • v22.1-streamlined • Streamlit {st.__version__}")
+st.caption(f"🛠️ Journalist's Toolkit • v22.2 • Streamlit {st.__version__}")
 
 # ---------- LIGHT COMPAT CSS SHIM (safe selectors only) ----------
 st.markdown(
@@ -87,7 +80,7 @@ if "journalism_level" not in st.session_state:
     st.session_state.journalism_level = "High School journalist"
 
 # =========================================================
-# PAGE: PORTAL
+# PAGE: PORTAL (simplified for high school demo)
 # =========================================================
 if st.session_state.page == "portal":
     # Hero
@@ -98,71 +91,42 @@ if st.session_state.page == "portal":
   color: white; border-radius: 16px;
   padding: 1.25rem 1.5rem 1rem 1.5rem; margin-bottom: 1rem;">
   <h1 style="margin:0 0 .5rem 0; font-weight:800;">Journalist's Toolkit</h1>
-  <p style="margin:0; opacity:.95;">A journalism tool that won't do your writing for you but will build your skills the way a great editor does—powered by AI, guided by real newsroom experience.</p>
+  <p style="margin:0; opacity:.95;">For students, freelancers, and young journalists: coaching that builds your skills the way a great editor does—through questions and a conversation. Powered by AI, guided by real newsroom experience.</p>
 </div>
 """,
         unsafe_allow_html=True,
     )
 
-    # Dek
-    st.markdown(
-        """
-If you're a student, a freelancer, or a young journalist working without a strong safety net, 
-Journalist's Toolkit can provide the structure, coaching and feedback the pros rely on.
-"""
-    )
-
-    st.markdown("---")
-
-    # How It Works
-    st.markdown("### How It Works")
-    st.markdown(
-        """
-**Answer questions** that replicate the grilling you'd get from a newsdesk editor.
-
-**Have a coaching session** with an AI that's been given a custom prompt—so it knows what you need, 
-where you're at on a story, and understands newsroom realities.
-"""
-    )
-
-    st.markdown("---")
-
-    # Start Here
-    st.markdown("### Start Here: Pre-Reporting Tools")
-    st.markdown("These tools help you prepare BEFORE you start your reporting.")
+    # Action prompt
+    st.markdown("### What do you need help with?")
 
     st.markdown("")  # spacing
 
-    left, right = st.columns(2)
+    left, middle, right = st.columns(3)
     with left:
         if st.button("Prepare a Story Pitch", type="primary", use_container_width=True):
             go_to("questionnaire")
-        st.caption("Stress-test your ideas.")
-        
-        st.markdown("")  # spacing
-        
-        if st.button("Prepare for an Interview", type="primary", use_container_width=True):
-            if _HAS_PREP:
-                go_to("prep")
-            else:
-                st.error("Prepare-for-Interview module not available.\n\n"
-                         f"{_PREP_IMPORT_ERR if '_PREP_IMPORT_ERR' in globals() else ''}")
-        st.caption("Combine research and a practice session.")
+        st.caption("Stress-test your idea before you take it to an editor.")
 
-    with right:
+    with middle:
         if st.button("Get Ready to Report", type="primary", use_container_width=True):
             go_to("grr_choice")
         st.caption("Figure out what you need to know and how to get started.")
 
-    st.markdown("---")
+    with right:
+        if st.button("Prepare for an Interview", type="primary", use_container_width=True):
+            if _HAS_PREP:
+                go_to("prep")
+            else:
+                st.error("Prepare-for-Interview module not available.")
+        st.caption("Research your subject and practice your questions.")
 
-    # Footer - In the Works
-    st.markdown("### In the Works: Your Newsroom Coach A-Z")
+    # In the Works footer (subtle, separated)
+    st.markdown("")
+    st.markdown("")
+    st.markdown("")
     st.markdown(
-        """
-JT is being built as a complete suite covering the entire reporting and writing process. 
-Currently available: pre-reporting prep. In development: source vetting, draft structure, fact-checking.
-"""
+        "*Journalist's Toolkit is under development. Sections will be added on outlining and preparing to write, evaluating and improving a draft, source evaluation, and fact-checking.*"
     )
 
 # =========================================================

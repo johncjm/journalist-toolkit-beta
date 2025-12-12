@@ -1,8 +1,8 @@
-# v22.2 — Simplified portal for high school demo
-# - Streamlined hero + dek (no "How It Works" section)
-# - Conversational "What do you need help with?" framing
-# - "In the Works" as subtle italic footer
-# - All other pages unchanged from v22.1
+# v22.3 — Added Quick Review module
+# - New "Finished a Draft?" section on portal
+# - Quick Review module integrated via jt_tools
+# - Updated "In the Works" footer
+# - All other functionality unchanged from v22.2
 
 import streamlit as st
 import textwrap
@@ -17,9 +17,17 @@ except Exception as _e:
     _HAS_PREP = False
     _PREP_IMPORT_ERR = _e
 
+# --- Quick Review tool (jt_tools) ---
+try:
+    from jt_tools.quick_review import render_quick_review
+    _HAS_QUICK_REVIEW = True
+except Exception as _e:
+    _HAS_QUICK_REVIEW = False
+    _QUICK_REVIEW_IMPORT_ERR = _e
+
 # ---------- APP CONFIG ----------
 st.set_page_config(page_title="Journalist's Toolkit", layout="wide")
-st.caption(f"🛠️ Journalist's Toolkit • v22.2 • Streamlit {st.__version__}")
+st.caption(f"🛠️ Journalist's Toolkit • v22.3 • Streamlit {st.__version__}")
 
 # ---------- LIGHT COMPAT CSS SHIM (safe selectors only) ----------
 st.markdown(
@@ -80,7 +88,7 @@ if "journalism_level" not in st.session_state:
     st.session_state.journalism_level = "High School journalist"
 
 # =========================================================
-# PAGE: PORTAL (simplified for high school demo)
+# PAGE: PORTAL (with Quick Review section)
 # =========================================================
 if st.session_state.page == "portal":
     # Hero
@@ -97,8 +105,9 @@ if st.session_state.page == "portal":
         unsafe_allow_html=True,
     )
 
-    # Action prompt
-    st.markdown("### What do you need help with?")
+    # ---- PRE-REPORTING SECTION ----
+    st.markdown("### Getting Started: Pre-Reporting Tools")
+    st.markdown("Prepare BEFORE you start your reporting.")
 
     st.markdown("")  # spacing
 
@@ -121,13 +130,46 @@ if st.session_state.page == "portal":
                 st.error("Prepare-for-Interview module not available.")
         st.caption("Research your subject and practice your questions.")
 
-    # In the Works footer (subtle, separated)
+    # ---- VISUAL SEPARATOR ----
+    st.markdown("")
+    st.markdown("---")
+    st.markdown("")
+
+    # ---- POST-DRAFTING SECTION ----
+    st.markdown("### Finished a Draft?")
+    st.markdown("Get a second set of eyes before you publish.")
+
+    st.markdown("")  # spacing
+
+    qr_col, spacer1, spacer2 = st.columns(3)
+    with qr_col:
+        if st.button("Quick Review", type="primary", use_container_width=True):
+            if _HAS_QUICK_REVIEW:
+                go_to("quick_review")
+            else:
+                st.error("Quick Review module not available.")
+        st.caption("A fast, final-pass check: hed/lede match, fairness, soft spots, copyediting patterns.")
+
+    # ---- IN THE WORKS FOOTER ----
     st.markdown("")
     st.markdown("")
     st.markdown("")
     st.markdown(
-        "*Journalist's Toolkit is under development. Sections will be added on outlining and preparing to write, evaluating and improving a draft, source evaluation, and fact-checking.*"
+        "*Journalist's Toolkit is under development. Coming soon: deeper draft revision coaching, "
+        "standalone fact-checking, source evaluation, and more. Quick Review is a final scan—"
+        "for bigger structural work, talk to your editor or advisor.*"
     )
+
+# =========================================================
+# PAGE: Quick Review (jt_tools module)
+# =========================================================
+elif st.session_state.page == "quick_review":
+    if _HAS_QUICK_REVIEW:
+        render_quick_review()
+    else:
+        st.error("Quick Review module failed to load.")
+        if st.button("← Back to Portal"):
+            go_to("portal")
 
 # =========================================================
 # PAGE: Prepare-for-Interview (jt_tools)
@@ -190,7 +232,6 @@ elif st.session_state.page == "reporting_plan_questionnaire":
     path = st.session_state.get("reporting_path", "event")
     st.title(f"Reporting Plan: {path.capitalize()} Path")
 
-    # Note: Experience level already set on grr_choice page, but show current selection
     st.caption(f"Experience level: {st.session_state.journalism_level}")
     st.markdown("---")
 
@@ -224,18 +265,13 @@ elif st.session_state.page == "reporting_plan_questionnaire":
             submitted = st.form_submit_button("Generate Prompt Recipe", type="primary", use_container_width=True)
             if submitted:
                 st.session_state.form_data = dict(
-                    q1_headline=q1_headline,
-                    q2_where_when=q2_where_when,
-                    q3_key_people=q3_key_people,
-                    q4_why_now=q4_why_now,
-                    q5_how_big=q5_how_big,
-                    q6_important=q6_important,
-                    q7_audience=q7_audience,
-                    q8_work_done=q8_work_done,
+                    q1_headline=q1_headline, q2_where_when=q2_where_when,
+                    q3_key_people=q3_key_people, q4_why_now=q4_why_now,
+                    q5_how_big=q5_how_big, q6_important=q6_important,
+                    q7_audience=q7_audience, q8_work_done=q8_work_done,
                     q9_prior_coverage=q9_prior_coverage,
                     q10_prior_coverage_effect=q10_prior_coverage_effect,
-                    q11_work_left=q11_work_left,
-                    q12_anxious_excited=q12_anxious_excited,
+                    q11_work_left=q11_work_left, q12_anxious_excited=q12_anxious_excited,
                     coaching_style=event_style,
                 )
                 st.session_state.reporting_path = "event"
@@ -269,16 +305,11 @@ elif st.session_state.page == "reporting_plan_questionnaire":
             submitted = st.form_submit_button("Generate Prompt Recipe", type="primary", use_container_width=True)
             if submitted:
                 st.session_state.form_data = dict(
-                    q1_territory=q1_territory,
-                    q2_hunch=q2_hunch,
-                    q3_curiosity=q3_curiosity,
-                    q4_audience=q4_audience,
-                    q5_know=q5_know,
-                    q6_dont_know=q6_dont_know,
-                    q7_prior_coverage=q7_prior_coverage,
-                    q8_relationship_bias=q8_relationship_bias,
-                    q9_plan_ideas=q9_plan_ideas,
-                    q10_first_step=q10_first_step,
+                    q1_territory=q1_territory, q2_hunch=q2_hunch,
+                    q3_curiosity=q3_curiosity, q4_audience=q4_audience,
+                    q5_know=q5_know, q6_dont_know=q6_dont_know,
+                    q7_prior_coverage=q7_prior_coverage, q8_relationship_bias=q8_relationship_bias,
+                    q9_plan_ideas=q9_plan_ideas, q10_first_step=q10_first_step,
                     coaching_style=explore_style,
                 )
                 st.session_state.reporting_path = "explore"
@@ -307,11 +338,8 @@ elif st.session_state.page == "reporting_plan_questionnaire":
             submitted = st.form_submit_button("Generate Prompt Recipe", type="primary", use_container_width=True)
             if submitted:
                 st.session_state.form_data = dict(
-                    q1_claim=q1_claim,
-                    q2_source=q2_source,
-                    q3_stakes=q3_stakes,
-                    q4_evidence=q4_evidence,
-                    q5_risks=q5_risks,
+                    q1_claim=q1_claim, q2_source=q2_source,
+                    q3_stakes=q3_stakes, q4_evidence=q4_evidence, q5_risks=q5_risks,
                     coaching_style=confirm_style,
                 )
                 st.session_state.reporting_path = "confirm"
@@ -502,21 +530,19 @@ elif st.session_state.page == "reporting_plan_recipe":
                 "Good **prompt engineering** means designing those instructions to get the most helpful and accurate coaching."
             )
             st.markdown("---")
-            st.markdown(
-                """
-1. **ROLE & GOAL** — Who the AI should be (e.g., an experienced editor) and what it's trying to accomplish (coach you by asking questions, not doing the work).
+            st.markdown("""
+1. **ROLE & GOAL** — Who the AI should be and what it's trying to accomplish.
 
-2. **CONTEXT** — Your answers from the questionnaire. This gives the AI concrete facts so its questions are specific and relevant.
+2. **CONTEXT** — Your answers from the questionnaire.
 
-3. **FLOW** — The conversation game plan: how to open (acknowledge + find gaps), where to probe (angles, logistics, sourcing, risks), and when to offer a choice about next steps.
+3. **FLOW** — The conversation game plan.
 
-4. **CONSTRAINTS** — Guardrails that keep the AI on track: *coach, don't do*; be Socratic; avoid naming specific people/institutions; push for verification when claims are made.
+4. **CONSTRAINTS** — Guardrails: *coach, don't do*; be Socratic.
 
-5. **ETHICAL LENS** — Consider bias, harm, privacy, diverse sourcing; plan mitigation before publishing.
+5. **ETHICAL LENS** — Consider bias, harm, privacy, diverse sourcing.
 
-6. **FINAL GOAL REMINDER** — You leave with a clear, actionable checklist that **you** built (not prose written for you).
-                """
-            )
+6. **FINAL GOAL** — You leave with a checklist that **you** built.
+            """)
 
     st.markdown("---")
     st.markdown("**💡 Tip:** These links are shortcuts—you can paste this into *any* AI chat tool.")
@@ -541,7 +567,6 @@ elif st.session_state.page == "questionnaire":
     st.components.v1.html("""<script>window.scrollTo(0,0);</script>""", height=0)
     st.title("Story Pitch Coach")
 
-    # Experience level selector at top
     level = st.radio(
         "Your experience level (affects coaching tone):",
         ["High School journalist", "Undergraduate journalist", "Grad school journalist", "Working journalist"],
@@ -580,16 +605,11 @@ elif st.session_state.page == "questionnaire":
                 st.error("Please paste your story pitch before submitting.")
             else:
                 st.session_state.form_data = dict(
-                    pitch_text=pitch_text,
-                    story_type_choice=story_type_choice,
-                    prior_coverage=prior_coverage,
-                    prior_coverage_effect=prior_coverage_effect,
-                    working_headline=working_headline,
-                    key_conflict=key_conflict,
-                    target_audience=target_audience,
-                    sources=sources,
-                    reporting_stage=reporting_stage,
-                    coaching_style=pitch_style,
+                    pitch_text=pitch_text, story_type_choice=story_type_choice,
+                    prior_coverage=prior_coverage, prior_coverage_effect=prior_coverage_effect,
+                    working_headline=working_headline, key_conflict=key_conflict,
+                    target_audience=target_audience, sources=sources,
+                    reporting_stage=reporting_stage, coaching_style=pitch_style,
                 )
                 go_to("recipe")
     if st.button("← Back to Portal"):
@@ -658,21 +678,17 @@ elif st.session_state.page == "recipe":
                 "Good **prompt engineering** means designing those instructions to get the most helpful and accurate coaching."
             )
             st.markdown("---")
-            st.markdown(
-                """
+            st.markdown("""
 1. **ROLE & GOAL** — Who the AI should be and what it's trying to achieve.
 
 2. **CONTEXT** — Your answers/pitch so questions are specific and relevant.
 
 3. **FLOW** — Plan for opening, probing, and choice of next steps.
 
-4. **CONSTRAINTS** — Guardrails: *coach, don't do*; be Socratic; avoid naming people/institutions; require verification.
+4. **CONSTRAINTS** — Guardrails: *coach, don't do*; be Socratic.
 
-5. **ETHICAL LENS** — Consider bias, harm, privacy, diverse sourcing.
-
-6. **FINAL GOAL REMINDER** — You leave with a clear, actionable checklist you built.
-                """
-            )
+5. **FINAL GOAL** — You leave with a clear, actionable checklist you built.
+            """)
 
     st.markdown("---")
     st.markdown("**💡 Tip:** Paste this into any AI chat.")
